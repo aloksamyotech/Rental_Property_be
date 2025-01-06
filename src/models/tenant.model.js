@@ -1,0 +1,88 @@
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+const tenantSchema = new Schema(
+  {
+    tenantName: {
+      type: String
+    },
+    email: {
+      type: String
+    },
+    password:{
+      type: String
+    },
+    phoneno: {
+      type: String
+    },
+    identityCardType: {
+      type: String
+    },
+    identityNo: {
+      type: String
+    },
+    identityImage: {
+      type: String
+    },
+    emergencyNo:{
+      type: String
+    },
+    address:{
+      type: String
+    },
+    role: {
+      type: String,
+      default:"tenant"
+    },
+    isDeleted: {
+      type: String,
+      default: false
+    },
+    companyId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company"
+    },  
+    reporterId:{
+      type: mongoose.Schema.Types.ObjectId
+    }
+  },
+  { timestamps: true },
+);
+
+tenantSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+tenantSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+tenantSchema.methods.generateAccessToken = function () {
+  const payload = {
+    _id: this._id,
+    email: this.email,
+    role: this.role
+  };
+
+  return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+  });
+};
+
+tenantSchema.methods.generateRefreshToken = function () {
+  const payload = {
+    _id: this._id,
+  };
+
+  return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+  });
+};
+
+
+const Tenant = mongoose.model("Tenant", tenantSchema);
+
+export default Tenant;
