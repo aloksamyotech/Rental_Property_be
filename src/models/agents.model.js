@@ -54,6 +54,7 @@ agentSchema.methods.generateAccessToken = function () {
   const payload = {
     _id: this._id,
     email: this.email,
+    role: this.role
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
