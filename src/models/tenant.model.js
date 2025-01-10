@@ -68,9 +68,10 @@ tenantSchema.methods.generateAccessToken = function () {
     companyId: this.companyId
   };
 
-  return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+  const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
   });
+  return token;
 };
 
 tenantSchema.methods.generateRefreshToken = function () {

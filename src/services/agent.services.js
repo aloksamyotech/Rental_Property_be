@@ -59,6 +59,8 @@ export const loginAgent = async (req, res) => {
   const { email, password } = req.body;
 
   const agent = await Agent.findOne({ email });
+
+  console.log(agent,"agent");
   if (!agent) {
     throw new CustomError(
       statusCodes?.notFound,

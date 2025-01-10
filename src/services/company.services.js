@@ -4,6 +4,8 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
+import Agent from "../models/agents.model.js";
+import Tenant from "../models/tenant.model.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
@@ -137,7 +139,7 @@ export const universalLogin = async (req, res) => {
 
   const loggedInUser = await user.constructor.findById(user._id).select("-password -refreshToken");
 
-  res.setHeader("token", accessToken);
+    res.setHeader("token", accessToken);
 
   const options = {
     httpOnly: true,
