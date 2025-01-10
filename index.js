@@ -8,6 +8,7 @@ import responseInterceptor from './src/utils/responseInterceptor.js';
 
 // import userRouter from './src/routes/user.routes.js';
 import propertyRouter from './src/routes/property.routes.js';
+import bookingRoutes from './src/routes/booking.routes.js';
 import agentRoutes from './src/routes/agents.routes.js';
 import tenantRoutes from'./src/routes/tenant.routes.js';
 import userRoutes from './src/routes/user.routes.js';
@@ -41,9 +42,10 @@ app.use(responseInterceptor);
 
 // app.use('/api/v1/user', userRouter)
 app.use('/api/v1/property', propertyRouter);
-app.use('/api/v1/agent',agentRoutes);
-app.use('/api/v1/tenant',tenantRoutes);
-app.use('/api/v1/owner',ownerRoutes);
+app.use('/api/v1/booking', bookingRoutes)
+app.use('/api/v1/agent', agentRoutes);
+app.use('/api/v1/tenant', tenantRoutes);
+app.use('/api/v1/owner', ownerRoutes);
 app.use('/api/v1/company', companyRoutes);
 app.use('/api/v1/types', typeRoutes);
 app.use('/api/v1/user', userRoutes);

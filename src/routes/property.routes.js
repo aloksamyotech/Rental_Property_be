@@ -9,7 +9,7 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 router.post("/register", asyncHandler(createProperty));
 router.put("/editproperty", asyncHandler(editProperty));
-router.patch("/delete", asyncHandler(deleteProperty))
+router.patch("/delete", asyncHandler(deleteProperty));
 router.get("/getproperty", asyncHandler(getProperty));
 
 export default router;

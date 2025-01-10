@@ -6,27 +6,28 @@ import CustomError from "../utils/exception.js";
 
 export const createBooking = async (req, res) => {
     const { 
+      tenantId,
       propertyId,
-      tanentId,
-      statingDate,
-      rentAmount
+      startingDate,
+      endingDate,
+      rentAmount,
+      advanceAmount,
+      companyId,
+      createdBy
     } = req.body;
 
     const newBooking = await Booking.create({
-      bookingId: generateBookingId(), 
-      propertyId, 
-      tanentId, 
-      bookingDate: new Date(),
-      statingDate,
+      tenantId,
+      propertyId,
+      startingDate,
+      endingDate,
       rentAmount,
-      createdBy: req.user._id
+      advanceAmount,
+      companyId,
+      createdBy
     });
 
-    return res.status(201).json({
-      success: true,
-      message: "booking done successfully!",
-      data: newBooking,
-    });
+    return newBooking;
 };
 
 const generateBookingId = () => {
@@ -37,29 +38,91 @@ const generateBookingId = () => {
 };
 
 
-export const editAgent = async(req, res, next) => {
-  const { id } = req.params;
-  const updateAgent = await Agent.findByIdAndUpdate(
+export const editBooking = async(req, res, next) => {
+  const { id } = req.query;
+  const updatedBooking = await Booking.findByIdAndUpdate(
     id,
   {
-    title:req.body?.title,
-    agentname:req.body?.agentname,
-    email:req.body?.email,
-    password:req.body?.password,
-    phoneno:req.body?.phoneno,
-    identityNo:req.body?.identityNo,
-    identityImage:req.body?.identityImage,
-    address:req.body?.address
+    tenantId:req.body?.tenantId,
+    propertyId: req.body?.propertyId,
+    startingDate: req.body?.startingDate,
+    endingDate:req.body?.endingDate ,
+    rentAmount:req.body?.rentAmount ,
+    advanceAmount: req.body?.advanceAmount,
+    companyId :req.body?.companyId,
+    createdBy: req.body?.createdBy
   },
   {
     new : true
   });
-  if (!updateAgent) {
+  if (!updatedBooking) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
       errorCodes?.service_unavailable,
     );
   }
-    return updateAgent;
+    return updatedBooking;
+};
+
+export const getBooking = async (req) => {
+  
+  const {id} = req.query;
+
+  const AllBooking = await Booking.find({createdBy: id})
+    .populate('tenantId', 'tenantName') 
+    .populate('propertyId', 'propertyname') 
+    .sort({ createdAt: -1 });
+
+  if (!AllBooking) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  // Example: Check user role (if needed)
+  // const Role = req.user.role;
+  // if (Role !== 'admin') {
+  //   throw new CustomError(
+  //     statusCodes?.conflict,
+  //     Message?.permissionDenied,
+  //     errorCodes?.permission_denied
+  //   );
+  // }
+
+  return AllBooking;
+};
+
+
+
+export const getAllBooking = async (req) => {
+  
+  const {id} = req.query;
+
+  const AllBooking = await Booking.find({companyId: id})
+    .populate('tenantId', 'tenantName') 
+    .populate('propertyId', 'propertyname')
+    .sort({ createdAt: -1 });
+
+  if (!AllBooking) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  // Example: Check user role (if needed)
+  // const Role = req.user.role;
+  // if (Role !== 'admin') {
+  //   throw new CustomError(
+  //     statusCodes?.conflict,
+  //     Message?.permissionDenied,
+  //     errorCodes?.permission_denied
+  //   );
+  // }
+
+  return AllBooking;
 };

@@ -9,8 +9,8 @@ export const companyRegistration = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
-export const companyLogin = async (req, res) => {
-  const data = await companyServices.companyLogin(req, res);
+export const universalLogin = async (req, res) => {
+  const data = await companyServices.universalLogin(req, res);
   console.log("....................................>>>>>>>>>>>>>>>", data);
   res
     .status(statusCodes?.ok)

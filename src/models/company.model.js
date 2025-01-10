@@ -49,8 +49,9 @@ companySchema.methods.isPasswordCorrect = async function (password) {
 companySchema.methods.generateAccessToken = function () {
   const payload = {
     _id: this._id,
-    email: this.email,
-    role: this.role
+    companyId: this._id,
+    role: this.role,
+    email: this.email
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -61,6 +62,9 @@ companySchema.methods.generateAccessToken = function () {
 companySchema.methods.generateRefreshToken = function () {
   const payload = {
     _id: this._id,
+    companyId: this._id,
+    role: this.role,
+    email: this.email
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
