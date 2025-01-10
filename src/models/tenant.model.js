@@ -67,14 +67,17 @@ tenantSchema.methods.generateAccessToken = function () {
     role: this.role
   };
 
-  return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+  const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
   });
+  return token;
 };
 
 tenantSchema.methods.generateRefreshToken = function () {
   const payload = {
     _id: this._id,
+    email: this.email,
+    role: this.role
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

@@ -10,7 +10,7 @@ export const companyRegistration = async (req, res) => {
 };
 
 export const companyLogin = async (req, res) => {
-  const data = await companyServices.companyLogin(req, res);
+  const data = await companyServices.userLogin(req, res);
   console.log("....................................>>>>>>>>>>>>>>>", data);
   res
     .status(statusCodes?.ok)
