@@ -3,6 +3,9 @@ import Tenant from "../models/tenant.model.js";
 import { errorCodes, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import { Message } from "../core/common/constant.js";
+import Booking from "../models/booking,model.js";
+import Agent from "../models/agents.model.js";
+import Company from "../models/company.model.js";
 
 
 export const createTenant = async (req) => {
@@ -138,20 +141,56 @@ export const getTenants = async (req, res, next) => {
       );
     }
 
-    console.log('Active tenants:', tenants);
+
 
 
     return tenants
 
 };
 
+export const mybooking = async (req, res, next) => {
+
+  const Id = req.query.id;
+
+  const tenantBooking = await Booking.find({ tenantId: Id, isDeleted: false })
+  .populate("tenantId", "tenantName")
+  .populate("propertyId", "propertyname")
+  .sort({ createdAt: -1 })
+  .lean();
+
+  if (!tenantBooking || tenantBooking.length === 0) {
+    throw new CustomError(
+      statusCodes?.badRequest,
+      "Tenant ID is required.",
+      errorCodes?.missing_parameter
+    );
+  }
+
+  const finalResponse = [];
+  for (const booking of tenantBooking) {
+
+    const createdBy = booking.createdBy;
+
+    let creater = await Agent.findById(createdBy);
+    let name;
+    if (creater) {
+      name = creater.agentName;
+    } else {
+      creater = await Company.findById(createdBy);
+      if (creater) {
+        name = creater.companyName;
+      }
+    }
+    finalResponse.push({ name, ...booking });
+  }
+
+  return finalResponse;
+};
+
 
 export const editTenant = async (req, res) => {
-  console.log(req.query.id,"req.queryreq.queryreq.query");
     const  tenantId  = req.query.id; 
     const updateData = req.body; 
-
-    console.log(tenantId, "tenantId");
 
     if (!tenantId) {
       throw new CustomError(
@@ -174,8 +213,6 @@ export const editTenant = async (req, res) => {
         errorCodes?.not_found
       );
     }
-
-    // Send successful response
     return updatedTenant;
 };
 

@@ -51,7 +51,8 @@ companySchema.methods.generateAccessToken = function () {
     _id: this._id,
     companyId: this._id,
     role: this.role,
-    email: this.email
+    email: this.email,
+    name: this.companyName
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -64,7 +65,8 @@ companySchema.methods.generateRefreshToken = function () {
     _id: this._id,
     companyId: this._id,
     role: this.role,
-    email: this.email
+    email: this.email,
+    name: this.companyName
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

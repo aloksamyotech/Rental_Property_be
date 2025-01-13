@@ -4,8 +4,6 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
-import Agent from "../models/agents.model.js";
-import Tenant from "../models/tenant.model.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
@@ -125,8 +123,7 @@ export const universalLogin = async (req, res) => {
       errorCodes?.not_found
     );
   }
-
-  // Verify the password
+  
   const passwordVerify = await user.isPasswordCorrect(password);
   if (!passwordVerify) {
     throw new CustomError(

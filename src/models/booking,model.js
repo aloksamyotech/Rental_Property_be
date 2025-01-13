@@ -14,7 +14,7 @@ const bookingSchema = new Schema(
     companyId:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company"
-    },
+    }, 
     bookingDate: {
       type: Date, 
       default: Date.now,

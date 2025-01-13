@@ -4,8 +4,7 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 
 export const createAgent = async (req, res) => {
-      // const ownerId = req.user._id;
-// console.log("useruseruseruseruseruseruser", ownerId);
+
 
 const { agentName, email, password, phoneNo, address, companyId } = req.body;
 
@@ -60,7 +59,7 @@ export const loginAgent = async (req, res) => {
 
   const agent = await Agent.findOne({ email });
 
-  console.log(agent,"agent");
+
   if (!agent) {
     throw new CustomError(
       statusCodes?.notFound,
