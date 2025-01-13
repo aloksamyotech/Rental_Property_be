@@ -1,20 +1,27 @@
-import * as tenantServices from "../services/tenant.services.js";
+// import * as tenantServices from "../services/tenant.services.js";
+import * as bookingServices from "../services/booking.services.js";
 import { Message, statusCodes } from "../core/common/constant.js";
 import { asyncHandler } from "../utils/asyncWrapper.js";
 import CustomError from "../utils/exception.js";
 
 
 
-export const bookProperty = async(req, res, next) => {
-  const tenantData = await tenantServices.createTenant(req, res);
-  res.status(statusCodes?.created).send(tenantData);
+export const createBooking = async(req, res, next) => {
+  const bookingData = await bookingServices.createBooking(req, res);
+  res.status(statusCodes?.created).send(bookingData);
 };
 
-export const tenantLogin = async (req, res) => {
-  const data = await tenantServices.loginTenant(req, res);
-  res
-    .status(statusCodes?.ok)
-    .cookie("accessToken", data?.accessToken, data?.options)
-    .cookie("refreshToken", data?.refreshToken, data?.options)
-    .send(data?.loginTenant);
+export const getBooking = async(req, res, next) => {
+  const bookingData = await bookingServices.getBooking(req, res);
+  res.status(statusCodes?.created).send(bookingData);
+};
+
+export const getAllBooking = async(req, res, next) => {
+  const bookingData = await bookingServices.getAllBooking(req, res);
+  res.status(statusCodes?.created).send(bookingData);
+};
+
+export const editBooking = async(req, res, next) => {
+  const bookingData = await bookingServices.editBooking(req, res);
+  res.status(statusCodes?.created).send(bookingData);
 };

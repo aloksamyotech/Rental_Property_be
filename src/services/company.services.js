@@ -4,6 +4,8 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
+import Agent from "../models/agents.model.js";
+import Tenant from "../models/tenant.model.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
@@ -47,103 +49,183 @@ export const companyRegistration = async (req) => {
     );
   }
   return createdCompany;
-};const generateAccessAndRefreshTokens = async (userId) => {
-
-  let user;
-  let role = "";
-
-  user = await Company.findById(userId);
-
-
-  if (!user) {
-      user = await Agent.findById(userId);
-  }
-
-  if (!user) {
-      user = await Tenant.findById(userId);
-  }
-
-  if (!user) {
-      throw new Error("User not found");
-  }
-
-  let accessToken = user.generateAccessToken();
-  let refreshToken = user.generateRefreshToken();
-
-
-  user.refreshToken = refreshToken;
-  await user.save({ validateBeforeSave: false });
-
-
-  return { accessToken, refreshToken };
 };
 
+// export const companyLogin = async (req, res) => {
+//   const { email, password } = req.body;
 
+//   const company = await Company.findOne({ email });
+//   if (!company) {
+//     throw new CustomError(
+//       statusCodes?.notFound,
+//       Message?.notFound,
+//       errorCodes?.not_found
+//     );
+//   }
 
-export const userLogin = async (req, res) => {
-    const { email, password } = req.body;
+//   const passwordVerify = await company.isPasswordCorrect(password);
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
+//   if (!passwordVerify) {
+//     throw new CustomError(
+//       statusCodes?.badRequest,
+//       Message?.inValid,
+//       errorCodes?.invalid_credentials
+//     );
+//   }
 
-    let user = await Company.findOne({ email });
-    let role = "companyAdmin";
+//   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+//     company._id
+//   );
 
-    if (!user) {
-      user = await Agent.findOne({ email });
-      role = "agent";
-    }
+//   const loginCompany = await Company.findById(company._id).select(
+//     "-password -refreshToken"
+//   );
 
-    if (!user) {
-      user = await Tenant.findOne({ email });
-      role = "tenant";
-    }
+//   res.setHeader("token", accessToken);
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+//   const options = {
+//     httpOnly: true,
+//     secure: true,
+//   };
 
+//   return {
+//     company,
+//     role: company.role,
+//     accessToken,
+//     refreshToken,
+//     options,
+//     loginCompany
+//   };
+// };
+
+export const universalLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  let user = null;
  
-    const passwordVerify = await user.isPasswordCorrect(password);
-    if (!passwordVerify) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
+  const company = await Company.findOne({ email });
+  const agent = await Agent.findOne({ email });
+  const tenant = await Tenant.findOne({ email });
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-      user._id 
+  if (company) {
+    user = company;
+
+  } else if (agent) {
+    user = agent;
+    
+  } else if (tenant) {
+    user = tenant;
+   
+  }
+
+  if (!user) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.not_found
     );
+  }
 
-    if (!accessToken || !refreshToken) {
-      return res.status(500).json({
-        success: false,
-        message: "Something went wrong while generating refresh and access tokens.",
-      });
-    }
+  // Verify the password
+  const passwordVerify = await user.isPasswordCorrect(password);
+  if (!passwordVerify) {
+    throw new CustomError(
+      statusCodes?.badRequest,
+      Message?.inValid,
+      errorCodes?.invalid_credentials
+    );
+  }
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+
+  const loggedInUser = await user.constructor.findById(user._id).select("-password -refreshToken");
 
     res.setHeader("token", accessToken);
 
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
+  const options = {
+    httpOnly: true,
+    secure: true, // Use true in production
+  };
 
-    return ({
+  // Return the response
+  return res.status(200).json({
+    user: loggedInUser,
     role: user.role,
     accessToken,
     refreshToken,
-    options
-    });
+    options,
+  });
 };
+
+
+
+
+const generateAccessAndRefreshTokens = async (userId) => {
+
+    const company = await Company.findById(userId);
+    const agent = await Agent.findById(userId);
+    const tenant = await Tenant.findById(userId);
+
+    let user;
+    let userType;
+
+    if (company) {
+      user = company;
+      userType = 'company';
+    } else if (agent) {
+      user = agent;
+      userType = 'agent';
+    } else if (tenant) {
+      user = tenant;
+      userType = 'tenant';
+    } else {
+      throw new CustomError(
+        statusCodes?.notFound,
+        "User not found in any collection.",
+        errorCodes?.user_not_found
+      );
+    }
+
+
+    let accessToken, refreshToken;
+    if (userType === 'company') {
+      accessToken = company.generateAccessToken();
+      refreshToken = company.generateRefreshToken();
+      user.refreshToken = refreshToken;
+    } else if (userType === 'agent') {
+      accessToken = agent.generateAccessToken();
+      refreshToken = agent.generateRefreshToken();
+      user.refreshToken = refreshToken;
+    } else if (userType === 'tenant') {
+      accessToken = tenant.generateAccessToken();
+      refreshToken = tenant.generateRefreshToken();
+      user.refreshToken = refreshToken;
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refreshToken };
+};
+
+
+
+// const generateAccessAndRefreshTokens = async (userId) => {
+//   try {
+//     const company = await Company.findById(userId);
+//     const accessToken = company.generateAccessToken();
+//     const refreshToken = company.generateRefreshToken();
+
+//     company.refreshToken = refreshToken;
+//     await company.save({ validateBeforeSave: false });
+//     return { accessToken, refreshToken };
+//   } catch (error) {
+//     throw new CustomError(
+//       statusCodes?.internalServerError,
+//       "Something went wrong while generating refresh and access tokens.",
+//       errorCodes?.server_error
+//     );
+//   }
+// };
+
 
 
 export const getAllCompany = async (req) => {

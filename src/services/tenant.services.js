@@ -123,7 +123,7 @@ export const loginTenant = async (req, res) => {
   };
 };
 export const getTenants = async (req, res, next) => {
-  try {
+
     const companyId = req.query.id;
 
     const tenants = await Tenant.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
@@ -140,21 +140,9 @@ export const getTenants = async (req, res, next) => {
 
     console.log('Active tenants:', tenants);
 
-    // Return the list of tenants
-    return res.status(statusCodes?.success || 200).json({
-      success: true,
-      data: tenants,
-    });
-  } catch (error) {
-    console.error('Error fetching tenants:', error);
-    return next(
-      new CustomError(
-        statusCodes?.serviceUnavailable,
-        Message?.serverError || 'Service unavailable',
-        errorCodes?.service_unavailable
-      )
-    );
-  }
+
+    return tenants
+
 };
 
 

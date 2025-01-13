@@ -53,8 +53,9 @@ agentSchema.methods.isPasswordCorrect = async function (password) {
 agentSchema.methods.generateAccessToken = function () {
   const payload = {
     _id: this._id,
-    email: this.email,
-    role: this.role
+    companyId: this.companyId,
+    role: this.role,
+    email: this.email
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -65,6 +66,9 @@ agentSchema.methods.generateAccessToken = function () {
 agentSchema.methods.generateRefreshToken = function () {
   const payload = {
     _id: this._id,
+    companyId: this.companyId,
+    role: this.role,
+    email: this.email
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

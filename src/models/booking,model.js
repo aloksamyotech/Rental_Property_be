@@ -7,22 +7,36 @@ const bookingSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Property"
     },
-    tanentId:{
+    tenantId:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant"
+    },
+    companyId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company"
     },
     bookingDate: {
       type: Date, 
       default: Date.now,
     },
-    statingDate: {
+    startingDate: {
       type: Date, 
+    },
+    endingDate: {
+      type: Date, 
+    },
+    advanceAmount:{
+      type: Number
     },
     rentAmount:{
       type: Number,
     },
     createdBy:{
       type: mongoose.Schema.Types.ObjectId
+    },
+    isDeleted:{
+      type: Boolean,
+      default: false
     },
     vacantNotice:{
       type: Boolean,
@@ -32,6 +46,6 @@ const bookingSchema = new Schema(
   { timestamps: true },
 );
 
-const Booking = mongoose.model("Property", bookingSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
 
 export default Booking;
