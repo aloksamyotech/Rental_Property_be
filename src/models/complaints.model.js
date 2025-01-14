@@ -28,7 +28,18 @@ const complaintSchema = new Schema(
     },
     description:{
       type: String
-    }
+    },
+    comment:{
+      type: String
+    },
+    isResolved:{
+      type: Boolean,
+      default: false
+    },
+    isDeleted:{
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true },
 );

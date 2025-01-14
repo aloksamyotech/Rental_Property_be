@@ -4,6 +4,7 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
+import Complaint from "../models/complaints.model.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
@@ -284,4 +285,39 @@ export const deleteCompany = async (req, res) => {
   await company.save();
 
   return company
+};
+
+
+
+
+export const commentAndResolved = async (req, res) => {
+  const companyId = req.query.id;
+  if (!companyId) {
+    throw new CustomError(
+      statusCodes.badRequest,
+      Message.missingId,
+      errorCodes.missing_id
+    );
+  }
+
+  const allComplain = await Complaint.find({ companyId, isDeleted: false })
+  .populate("tenantId", "tenantName") 
+  .populate("propertyId", "propertyname")
+  .sort({ createdAt: -1 })
+  .lean();
+
+  // const AllBooking = await Booking.find({ createdBy: id })
+  // .populate("tenantId", "tenantName")
+  // .populate("propertyId", "propertyname")
+  // .sort({ createdAt: -1 })
+  // .lean();
+
+  if (!allComplain) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.serverError,
+      errorCodes?.conflict,
+    );
+  }
+  return allComplain;
 };
