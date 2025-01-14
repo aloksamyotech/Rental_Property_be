@@ -65,7 +65,8 @@ tenantSchema.methods.generateAccessToken = function () {
     _id: this._id,
     email: this.email,
     role: this.role,
-    companyId: this.companyId
+    companyId: this.companyId,
+    name: this.tenantName
   };
 
   const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -79,7 +80,9 @@ tenantSchema.methods.generateRefreshToken = function () {
     _id: this._id,
     email: this.email,
     role: this.role,
-    companyId: this.companyId
+    companyId: this.companyId,
+    name: this.tenantName,
+    reporterId :this.reporterId
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

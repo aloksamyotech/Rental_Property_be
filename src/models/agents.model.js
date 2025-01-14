@@ -55,7 +55,8 @@ agentSchema.methods.generateAccessToken = function () {
     _id: this._id,
     companyId: this.companyId,
     role: this.role,
-    email: this.email
+    email: this.email,
+    name : this.agentName
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -68,7 +69,8 @@ agentSchema.methods.generateRefreshToken = function () {
     _id: this._id,
     companyId: this.companyId,
     role: this.role,
-    email: this.email
+    email: this.email,
+    name : this.agentName
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

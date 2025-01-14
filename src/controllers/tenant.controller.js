@@ -24,6 +24,11 @@ export const getTenants = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
+export const mybookings = async(req, res, next) => {
+  const bookingData = await tenantServices.mybooking(req, res, next);
+  res.status(statusCodes?.created).send(bookingData);
+};
+
 export const getTenantsById = async(req, res, next) => {
   const propertyData = await tenantServices.getTenantsById(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
