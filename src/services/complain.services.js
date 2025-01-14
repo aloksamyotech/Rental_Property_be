@@ -5,7 +5,7 @@ import Complaint from "../models/complaints.model.js";
 
 export const complainRegistration = async (req, res) => {
 
-  const { tenantName,propertyId, companyId, tenantId, agentId, concernTopic, discription } = req.body;
+  const { tenantName,propertyId, companyId, tenantId, agentId, concernTopic, description } = req.body;
 
   const isComplainAlreadyExist = await Complaint.findOne({ concernTopic });
 
@@ -24,7 +24,7 @@ export const complainRegistration = async (req, res) => {
     tenantId,
     agentId,
     concernTopic,
-    discription,
+    description,
   });
 
   return complain;

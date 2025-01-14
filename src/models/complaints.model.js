@@ -26,7 +26,7 @@ const complaintSchema = new Schema(
     concernTopic:{
       type: String,
     },
-    discription:{
+    description:{
       type: String
     }
   },
