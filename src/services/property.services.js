@@ -19,16 +19,7 @@ export const createProperty = async(req, res) => {
     ownerId,
     companyId
   } = req.body; 
-  // const userId = req.user._id;
 
-//  const owner = await Owner.findById(userId);
-//  if(!owner){
-//   throw new CustomError(
-//     statusCodes?.conflict,
-//     Message?.alreadyExist,
-//     errorCodes?.already_exist,
-//   );
-//  }
 
   const isPropertyAlreadyExist = await Property.findOne({ propertyname });
   if (isPropertyAlreadyExist) {

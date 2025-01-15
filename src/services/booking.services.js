@@ -83,15 +83,6 @@ export const getBooking = async (req) => {
     );
   }
 
-  // Example: Check user role (if needed)
-  // const Role = req.user.role;
-  // if (Role !== 'admin') {
-  //   throw new CustomError(
-  //     statusCodes?.conflict,
-  //     Message?.permissionDenied,
-  //     errorCodes?.permission_denied
-  //   );
-  // }
   const finalResponse = [];
   for (const booking of AllBooking) {
     const createdBy = booking.createdBy;
