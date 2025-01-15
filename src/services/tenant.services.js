@@ -125,6 +125,26 @@ export const loginTenant = async (req, res) => {
     loginTenant
   };
 };
+
+// export const getTenants = async (req, res, next) => {
+
+//     const companyId = req.query.id;
+
+//     const tenants = await Tenant.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
+
+//     if (!tenants || tenants.length === 0) {
+//       return next(
+//         new CustomError(
+//           statusCodes?.notFound,
+//           Message?.notFound || 'No tenants found',
+//           errorCodes?.not_found
+//         )
+//       );
+//     }
+//     return tenants
+
+// };
+
 export const getTenants = async (req, res, next) => {
 
     const companyId = req.query.id;
@@ -140,10 +160,6 @@ export const getTenants = async (req, res, next) => {
         )
       );
     }
-
-
-
-
     return tenants
 
 };

@@ -32,7 +32,7 @@ const complaintSchema = new Schema(
     comment:{
       type: String
     },
-    isResolved:{
+    status:{
       type: Boolean,
       default: false
     },
