@@ -5,7 +5,6 @@ import { Message } from "../core/common/constant.js";
 
 export const createType = async (req, res) => {
   const { name, description, companyId } = req.body;
-  // console.log(req.body,"hjhjbb")
 
   const isTypeAlreadyExist = await Type.findOne({ name });
 

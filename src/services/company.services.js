@@ -4,6 +4,7 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
+import Complaint from "../models/complaints.model.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
@@ -100,20 +101,17 @@ export const universalLogin = async (req, res) => {
   const { email, password } = req.body;
 
   let user = null;
- 
+
   const company = await Company.findOne({ email });
   const agent = await Agent.findOne({ email });
   const tenant = await Tenant.findOne({ email });
 
   if (company) {
     user = company;
-
   } else if (agent) {
     user = agent;
-    
   } else if (tenant) {
     user = tenant;
-   
   }
 
   if (!user) {
@@ -123,7 +121,7 @@ export const universalLogin = async (req, res) => {
       errorCodes?.not_found
     );
   }
-  
+
   const passwordVerify = await user.isPasswordCorrect(password);
   if (!passwordVerify) {
     throw new CustomError(
@@ -132,11 +130,15 @@ export const universalLogin = async (req, res) => {
       errorCodes?.invalid_credentials
     );
   }
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id
+  );
 
-  const loggedInUser = await user.constructor.findById(user._id).select("-password -refreshToken");
+  const loggedInUser = await user.constructor
+    .findById(user._id)
+    .select("-password -refreshToken");
 
-    res.setHeader("token", accessToken);
+  res.setHeader("token", accessToken);
 
   const options = {
     httpOnly: true,
@@ -153,57 +155,50 @@ export const universalLogin = async (req, res) => {
   });
 };
 
-
-
-
 const generateAccessAndRefreshTokens = async (userId) => {
+  const company = await Company.findById(userId);
+  const agent = await Agent.findById(userId);
+  const tenant = await Tenant.findById(userId);
 
-    const company = await Company.findById(userId);
-    const agent = await Agent.findById(userId);
-    const tenant = await Tenant.findById(userId);
+  let user;
+  let userType;
 
-    let user;
-    let userType;
+  if (company) {
+    user = company;
+    userType = "company";
+  } else if (agent) {
+    user = agent;
+    userType = "agent";
+  } else if (tenant) {
+    user = tenant;
+    userType = "tenant";
+  } else {
+    throw new CustomError(
+      statusCodes?.notFound,
+      "User not found in any collection.",
+      errorCodes?.user_not_found
+    );
+  }
 
-    if (company) {
-      user = company;
-      userType = 'company';
-    } else if (agent) {
-      user = agent;
-      userType = 'agent';
-    } else if (tenant) {
-      user = tenant;
-      userType = 'tenant';
-    } else {
-      throw new CustomError(
-        statusCodes?.notFound,
-        "User not found in any collection.",
-        errorCodes?.user_not_found
-      );
-    }
+  let accessToken, refreshToken;
+  if (userType === "company") {
+    accessToken = company.generateAccessToken();
+    refreshToken = company.generateRefreshToken();
+    user.refreshToken = refreshToken;
+  } else if (userType === "agent") {
+    accessToken = agent.generateAccessToken();
+    refreshToken = agent.generateRefreshToken();
+    user.refreshToken = refreshToken;
+  } else if (userType === "tenant") {
+    accessToken = tenant.generateAccessToken();
+    refreshToken = tenant.generateRefreshToken();
+    user.refreshToken = refreshToken;
+  }
 
+  await user.save({ validateBeforeSave: false });
 
-    let accessToken, refreshToken;
-    if (userType === 'company') {
-      accessToken = company.generateAccessToken();
-      refreshToken = company.generateRefreshToken();
-      user.refreshToken = refreshToken;
-    } else if (userType === 'agent') {
-      accessToken = agent.generateAccessToken();
-      refreshToken = agent.generateRefreshToken();
-      user.refreshToken = refreshToken;
-    } else if (userType === 'tenant') {
-      accessToken = tenant.generateAccessToken();
-      refreshToken = tenant.generateRefreshToken();
-      user.refreshToken = refreshToken;
-    }
-
-    await user.save({ validateBeforeSave: false });
-
-    return { accessToken, refreshToken };
+  return { accessToken, refreshToken };
 };
-
-
 
 // const generateAccessAndRefreshTokens = async (userId) => {
 //   try {
@@ -223,10 +218,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 //   }
 // };
 
-
-
 export const getAllCompany = async (req) => {
-  const AllComp = await Company.find({isDeleted: false}).sort({ createdAt: -1 });
+  const AllComp = await Company.find({ isDeleted: false }).sort({
+    createdAt: -1,
+  });
 
   if (!AllComp) {
     throw new CustomError(
@@ -248,25 +243,22 @@ export const getAllCompany = async (req) => {
   return AllComp;
 };
 
-export const editCompany = async(req, res, next) => {
+export const editCompany = async (req, res, next) => {
   const CompanyId = req.query.id;
-  const updateData = req.body; 
-  const editCompany = await Company.findByIdAndUpdate(
-    CompanyId,
-    updateData,
-    { new: true, runValidators: true } 
-  ) 
+  const updateData = req.body;
+  const editCompany = await Company.findByIdAndUpdate(CompanyId, updateData, {
+    new: true,
+    runValidators: true,
+  });
   if (!updateData) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
-      errorCodes?.service_unavailable,
+      errorCodes?.service_unavailable
     );
   }
-    return editCompany;
+  return editCompany;
 };
-
-
 
 export const deleteCompany = async (req, res) => {
   const companyId = req.query.id;
@@ -283,5 +275,33 @@ export const deleteCompany = async (req, res) => {
   company.isDeleted = true;
   await company.save();
 
-  return company
+  return company;
+};
+
+export const commentAndResolved = async (req, res) => {
+  const companyId = req.query.id;
+  if (!companyId) {
+    throw new CustomError(
+      statusCodes.badRequest,
+      Message.missingId,
+      errorCodes.missing_id
+    );
+  }
+
+  const allComplain = await Complaint.find({ companyId, isDeleted: false })
+    .populate("tenantId", "tenantName")
+    .populate("propertyId", "propertyname")
+    .sort({ createdAt: -1 })
+    .lean();
+
+
+
+  if (!allComplain) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.serverError,
+      errorCodes?.conflict
+    );
+  }
+  return allComplain;
 };

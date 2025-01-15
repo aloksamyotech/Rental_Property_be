@@ -33,3 +33,8 @@ export const deleteCompany = async (req, res) => {
   const companyData = await companyServices.deleteCompany(req, res);
   res.status(statusCodes?.created).send(companyData);
 };
+
+export const commentAndResolved = async (req, res) => {
+  const companyData = await companyServices.commentAndResolved(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
