@@ -105,21 +105,22 @@ export const resolveComplain = async (req, res) => {
     );
   }
 
-  complain.status = true ;
+  complain.status = !complain.status;
 
   await complain.save();
   return complain;
 };
 
 export const addCommentToComplain = async (req, res) => {
-  const compalainId = req.query.id;
-  const {comment} = req.body;
+  // const compalainId = req.query.id;
+  const {id}= req.query;
+  const {comment} =req.body;
 
-  const complain = await Complaint.findById(compalainId);
+  const complain = await Complaint.findById(id);
   if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound || "Complain not found",
       errorCodes?.not_found
     );
   }

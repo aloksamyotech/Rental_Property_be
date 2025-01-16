@@ -45,5 +45,10 @@ export const resolveComplain = async (req, res) => {
   res.status(statusCodes?.created).send(complainData);
 };
 
+export const addCommentToComplain = async (req, res) => {
+  const complainData = await complainServices.addCommentToComplain(req, res);
+  res.status(statusCodes?.created).send(complainData);
+};
+
 
 
