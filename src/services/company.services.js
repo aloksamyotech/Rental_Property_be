@@ -10,16 +10,6 @@ export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address } = req.body;
   const isCompanyAlreadyExist = await Company.findOne({ email });
 
-  // const Role =  req.user.role;
-
-  // if(!(Role == "admin")){
-  //   throw new CustomError(
-  //     statusCodes?.conflict,
-  //     Message?.alreadyExist,
-  //     errorCodes?.already_exist
-  //   );
-  // }
-
   if (isCompanyAlreadyExist) {
     throw new CustomError(
       statusCodes?.conflict,
@@ -200,23 +190,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   return { accessToken, refreshToken };
 };
 
-// const generateAccessAndRefreshTokens = async (userId) => {
-//   try {
-//     const company = await Company.findById(userId);
-//     const accessToken = company.generateAccessToken();
-//     const refreshToken = company.generateRefreshToken();
 
-//     company.refreshToken = refreshToken;
-//     await company.save({ validateBeforeSave: false });
-//     return { accessToken, refreshToken };
-//   } catch (error) {
-//     throw new CustomError(
-//       statusCodes?.internalServerError,
-//       "Something went wrong while generating refresh and access tokens.",
-//       errorCodes?.server_error
-//     );
-//   }
-// };
 
 export const getAllCompany = async (req) => {
   const AllComp = await Company.find({ isDeleted: false }).sort({
@@ -231,15 +205,6 @@ export const getAllCompany = async (req) => {
     );
   }
 
-  // const Role =  req.user.role;
-
-  // if(!(Role == "admin")){
-  //   throw new CustomError(
-  //     statusCodes?.conflict,
-  //     Message?.alreadyExist,
-  //     errorCodes?.already_exist
-  //   );
-  // }
   return AllComp;
 };
 
@@ -278,30 +243,28 @@ export const deleteCompany = async (req, res) => {
   return company;
 };
 
-export const commentAndResolved = async (req, res) => {
-  const companyId = req.query.id;
-  if (!companyId) {
-    throw new CustomError(
-      statusCodes.badRequest,
-      Message.missingId,
-      errorCodes.missing_id
-    );
-  }
+// export const commentAndResolved = async (req, res) => {
+//   const companyId = req.query.id;
+//   if (!companyId) {
+//     throw new CustomError(
+//       statusCodes.badRequest,
+//       Message.missingId,
+//       errorCodes.missing_id
+//     );
+//   }
 
-  const allComplain = await Complaint.find({ companyId, isDeleted: false })
-    .populate("tenantId", "tenantName")
-    .populate("propertyId", "propertyname")
-    .sort({ createdAt: -1 })
-    .lean();
+//   const allComplain = await Complaint.find({ companyId, isDeleted: false })
+//     .populate("tenantId")
+//     .populate("propertyId", "propertyname")
+//     .sort({ createdAt: -1 })
+//     .lean();
 
-
-
-  if (!allComplain) {
-    throw new CustomError(
-      statusCodes?.conflict,
-      Message?.serverError,
-      errorCodes?.conflict
-    );
-  }
-  return allComplain;
-};
+//   if (!allComplain) {
+//     throw new CustomError(
+//       statusCodes?.conflict,
+//       Message?.serverError,
+//       errorCodes?.conflict
+//     );
+//   }
+//   return allComplain;
+// };
