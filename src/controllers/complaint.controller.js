@@ -35,6 +35,10 @@ export const allComplainForCompany = async (req, res) => {
   res.status(statusCodes?.created).send(complainData);
 };
 
+export const getComplainById = async (req, res) => {
+  const complainData = await complainServices.fetchComplainById(req, res);
+  res.status(statusCodes?.created).send(complainData);
+};
 
 export const resolveComplain = async (req, res) => {
   const complainData = await complainServices.resolveComplain(req, res);

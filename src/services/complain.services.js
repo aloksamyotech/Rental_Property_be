@@ -139,7 +139,11 @@ export const fetchComplainById = async(req,res) =>{
       errorCodes.missing_id
     );
    }
-   const complain = await Complaint.find({_id:complainId});
+   const complain = await Complaint.find({_id:complainId})
+   .populate("tenantId")
+   .populate("propertyId")
+   .populate("companyId")
+   .lean();
    if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
