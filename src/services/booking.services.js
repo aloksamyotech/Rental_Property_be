@@ -102,13 +102,32 @@ export const getBooking = async (req) => {
   return finalResponse;
 };
 
+export const getBookingById = async(req) =>{
+  const {id} = req.query;
+  const booking = await Booking.findById(id)
+  .populate("tenantId")
+  .populate("propertyId")
+  .populate("companyId")
+  .sort({ createdAt: -1 })
+  .lean();
+ 
+  if (!booking || booking.length === 0) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return booking
+}
+
 export const getAllBooking = async (req) => {
   const { id } = req.query;
 
   // Fetch bookings
   const allBooking = await Booking.find({ companyId: id })
-    .populate("tenantId", "tenantName")
-    .populate("propertyId", "propertyname")
+    .populate("tenantId")
+    .populate("propertyId")
     .sort({ createdAt: -1 })
     .lean();
 

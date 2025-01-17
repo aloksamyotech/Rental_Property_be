@@ -12,6 +12,8 @@ router.get("/getTenantById", asyncHandler(getTenantsById));
 router.put("/editTenant", asyncHandler(editTenant));
 router.post("/login", asyncHandler(tenantLogin));
 router.patch("/delete", asyncHandler(deleteTenantById));
+
 router.get("/mybooking", asyncHandler(mybookings))
+
 
 export default router;
