@@ -5,6 +5,9 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
+import Tenant from "../models/tenant.model.js";
+
+
 export const createBooking = async (req, res) => {
   const {
     tenantId,
@@ -25,8 +28,16 @@ export const createBooking = async (req, res) => {
     rentAmount,
     advanceAmount,
     companyId,
-    createdBy,
+    createdBy
   });
+  const property = await Property.findById(propertyId);
+  property.isVacant = false;
+  await property.save();
+
+  const tenant = await Tenant.findById(tenantId);
+  tenant.isOccupied = true;
+  await tenant.save();
+
 
   return newBooking;
 };
@@ -69,7 +80,7 @@ export const editBooking = async (req, res, next) => {
 export const getBooking = async (req) => {
   const { id } = req.query;
 
-  const AllBooking = await Booking.find({ createdBy: id })
+  const AllBooking = await Booking.find({ createdBy: id , isDeleted: false})
   .populate("tenantId", "tenantName")
   .populate("propertyId", "propertyname")
   .sort({ createdAt: -1 })
@@ -121,11 +132,57 @@ export const getBookingById = async(req) =>{
   return booking
 }
 
+
+export const breakTheBooking = async (req) => {
+  const { id } = req.query;
+
+  // Fetch the booking
+  const booking = await Booking.findById(id);
+  if (!booking) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  booking.isDeleted = true;
+  booking.save();
+
+  const tenant = await Tenant.findById(booking.tenantId);
+  if (!tenant) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      "Tenant not found",
+      errorCodes?.no_data_found
+    );
+  }
+
+  tenant.isOccupied = false;
+  await tenant.save();
+
+  const property = await Property.findById(booking.propertyId);
+  if (!property) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      "Property not found",
+      errorCodes?.no_data_found
+    );
+  }
+
+  property.isVacant = true;
+  await property.save();
+
+  return booking;
+};
+
+
+
+
 export const getAllBooking = async (req) => {
   const { id } = req.query;
 
   // Fetch bookings
-  const allBooking = await Booking.find({ companyId: id })
+  const allBooking = await Booking.find({ companyId: id , isDeleted: false})
     .populate("tenantId")
     .populate("propertyId")
     .sort({ createdAt: -1 })

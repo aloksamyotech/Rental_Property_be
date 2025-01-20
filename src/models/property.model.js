@@ -37,6 +37,10 @@ const propertySchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company"
     },
+    isVacant:{
+      type: Boolean,
+      default: true
+    },
   },
   { timestamps: true },
 );

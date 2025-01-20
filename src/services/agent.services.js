@@ -2,6 +2,7 @@ import Agent from "../models/agents.model.js";
 import Property from "../models/property.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
+import Tenant from "../models/tenant.model.js";
 
 export const createAgent = async (req, res) => {
 
@@ -158,3 +159,4 @@ export const deleteAgent = async (req, res) => {
 
   return agent
 };
+
