@@ -4,6 +4,7 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import jwt from 'jsonwebtoken';
 import Owner from "../models/owner.model.js";
+import Booking from "../models/booking,model.js";
 
 
 
@@ -19,7 +20,6 @@ export const createProperty = async(req, res) => {
     ownerId,
     companyId
   } = req.body; 
-
 
   const isPropertyAlreadyExist = await Property.findOne({ propertyname });
   if (isPropertyAlreadyExist) {
@@ -78,6 +78,43 @@ export const getProperty = async(req, res, next) => {
   console.log("PropertiesPropertiesPropertiesProperties",Properties);
     return Properties;
 };
+
+const getOneMonthBeforeRange = () => {
+  const currentDate = new Date();
+  
+  const startOfOneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());  
+
+  const endOfOneMonthAgo = new Date(startOfOneMonthAgo);
+  endOfOneMonthAgo.setHours(23, 59, 59, 999); 
+
+  return { startOfOneMonthAgo, endOfOneMonthAgo };
+};
+
+export const PropertyOnNotice = async (req, res, next) => {
+
+    const { id } = req.query;  
+
+    if (!id) {
+      return res.status(400).json({ message: 'Company ID is required' });
+    }
+
+    const { startOfOneMonthAgo, endOfOneMonthAgo } = getOneMonthBeforeRange();
+
+  
+    const bookings = await Booking.find({
+      companyId: id,  
+      bookingDate: {
+        $gte: startOfOneMonthAgo,  
+        $lte: endOfOneMonthAgo     
+      },
+      isDeleted: false          
+    });
+
+    return  bookings ;
+
+
+};
+
 
 
 export const deleteProperty = async (req, res) => {

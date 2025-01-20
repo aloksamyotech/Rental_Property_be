@@ -29,3 +29,8 @@ export const getById = async(req, res, next) => {
   const propertyData = await propertyServices.getProperty(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
 };
+
+export const vacantPropertyOnNotice = async(req, res, next) => {
+  const propertyData = await propertyServices.PropertyOnNotice(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
