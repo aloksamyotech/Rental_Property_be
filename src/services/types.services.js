@@ -30,7 +30,7 @@ export const getAllTypes = async (req, res) => {
 
     const types = await Type.find({ companyId }).sort({ createdAt: -1 });
 
-    if (!types || types.length === 0) {
+    if (!types ) {
       throw new CustomError(
           statusCodes?.notFound,
           Message?.notFound,

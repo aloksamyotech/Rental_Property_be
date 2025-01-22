@@ -30,7 +30,13 @@ export const getById = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
-export const vacantPropertyOnNotice = async(req, res, next) => {
-  const propertyData = await propertyServices.PropertyOnNotice(req, res, next);
+export const getVacantProperty = async(req, res, next) => {
+  const propertyData = await propertyServices.getVacantProperty(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
 };
+
+export const uploadProperty = async(req, res, next) => {
+  const propertyData = await propertyServices.uploadProperty(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
+

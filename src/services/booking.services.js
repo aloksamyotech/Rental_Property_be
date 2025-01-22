@@ -122,7 +122,7 @@ export const getBookingById = async(req) =>{
   .sort({ createdAt: -1 })
   .lean();
  
-  if (!booking || booking.length === 0) {
+  if (!booking ) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound,
@@ -181,14 +181,13 @@ export const breakTheBooking = async (req) => {
 export const getAllBooking = async (req) => {
   const { id } = req.query;
 
-  // Fetch bookings
   const allBooking = await Booking.find({ companyId: id , isDeleted: false})
     .populate("tenantId")
     .populate("propertyId")
     .sort({ createdAt: -1 })
     .lean();
 
-  if (!allBooking || allBooking.length === 0) {
+  if (!allBooking) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.noDataFound,
@@ -213,4 +212,26 @@ export const getAllBooking = async (req) => {
     finalResponse.push({ name, ...booking });
   }
   return finalResponse;
+};
+
+
+export const vacantPropertyOnNotice = async (req, res) => {
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
+    const after15Days = new Date();
+    after15Days.setDate(today.getDate() + 15);
+    after15Days.setHours(23, 59, 59, 999); 
+
+    const bookings = await Booking.find({
+      endingDate: {
+        $gte: today, 
+        $lte: after15Days,
+      },
+      isDeleted: false, 
+    }).populate("propertyId tenantId companyId"); 
+  
+    return bookings;
+ 
 };

@@ -13,6 +13,9 @@ const propertySchema = new Schema(
     description:{
       type: String
     },
+    files: {
+        type: [String] 
+      },
     address: {
       type: String
     },
