@@ -34,3 +34,5 @@ export const deleteAgent = async(req, res, next) => {
   const agentData = await agentServices.deleteAgent(req, res);
   res.status(statusCodes?.created).send(agentData);
 };
+
+

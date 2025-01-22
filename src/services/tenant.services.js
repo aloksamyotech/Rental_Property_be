@@ -146,23 +146,24 @@ export const loginTenant = async (req, res) => {
 // };
 
 export const getTenants = async (req, res, next) => {
+    const { id: companyId } = req.query;
 
-    const companyId = req.query.id;
-
-    const tenants = await Tenant.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
+    const tenants = await Tenant.find({
+      companyId,
+      isDeleted: false,
+    }).sort({ createdAt: -1 });
 
     if (!tenants || tenants.length === 0) {
-      return next(
-        new CustomError(
-          statusCodes?.notFound,
-          Message?.notFound || 'No tenants found',
-          errorCodes?.not_found
-        )
+      throw new CustomError(
+        statusCodes?.notFound,
+        Message?.notFound || 'No tenants found',
+        errorCodes?.not_found
       );
     }
-    return tenants
 
+    return tenants;
 };
+
 
 export const mybooking = async (req, res, next) => {
 
@@ -250,3 +251,15 @@ export const deleteTenantById = async (req, res) => {
     return tenant
 };
 
+export const getMyTenants = async (req, res) => {
+  const id = req.query.id;
+  const tenant = await Tenant.find({reporterId:id ,isDeleted: false}).sort({ createdAt: -1 });
+  if (!tenant) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || "Tenant not found",
+      errorCodes?.not_found
+    );
+  }
+  return tenant;
+};

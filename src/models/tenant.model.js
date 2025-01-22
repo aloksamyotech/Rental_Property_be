@@ -36,7 +36,11 @@ const tenantSchema = new Schema(
       default:"tenant"
     },
     isDeleted: {
-      type: String,
+      type: Boolean,
+      default: false
+    },
+    isOccupied: {
+      type: Boolean,
       default: false
     },
     companyId:{

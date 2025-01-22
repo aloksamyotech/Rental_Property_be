@@ -30,3 +30,8 @@ export const getBookingById = async(req, res, next) => {
   const bookingData = await bookingServices.getBookingById(req, res);
   res.status(statusCodes?.created).send(bookingData);
 };
+
+export const breakTheBooking = async(req, res, next) => {
+  const bookingData = await bookingServices.breakTheBooking(req, res);
+  res.status(statusCodes?.created).send(bookingData);
+};

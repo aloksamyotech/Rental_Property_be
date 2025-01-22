@@ -38,6 +38,7 @@ const bookingSchema = new Schema(
       type: Boolean,
       default: false
     },
+ 
     vacantNotice:{
       type: Boolean,
       default: true

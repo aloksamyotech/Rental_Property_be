@@ -19,9 +19,9 @@ export const tenantLogin = async (req, res) => {
     .send(data?.loginTenant);
 };
 
-export const getTenants = async(req, res, next) => {
-  const propertyData = await tenantServices.getTenants(req, res, next);
-  res.status(statusCodes?.created).send(propertyData);
+export const getMyTenants = async(req, res, next) => {
+  const TenantData = await tenantServices.getMyTenants(req, res, next);
+  res.status(statusCodes?.created).send(TenantData);
 };
 
 export const mybookings = async(req, res, next) => {
@@ -30,16 +30,21 @@ export const mybookings = async(req, res, next) => {
 };
 
 export const getTenantsById = async(req, res, next) => {
-  const propertyData = await tenantServices.getTenantsById(req, res, next);
-  res.status(statusCodes?.created).send(propertyData);
+  const TenantData = await tenantServices.getTenantsById(req, res, next);
+  res.status(statusCodes?.created).send(TenantData);
 };
 
 export const editTenant = async(req, res) => {
-  const propertyData = await tenantServices.editTenant(req, res);
-  res.status(statusCodes?.created).send(propertyData);
+  const TenantData = await tenantServices.editTenant(req, res);
+  res.status(statusCodes?.created).send(TenantData);
 };
 
 export const deleteTenantById = async(req, res) => {
   const deletedData = await tenantServices.deleteTenantById(req, res);
   res.status(statusCodes?.created).send(deletedData);
+};
+
+export const getTenants = async(req, res, next) => {
+  const propertyData = await tenantServices.getTenants(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
 };
