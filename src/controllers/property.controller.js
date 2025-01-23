@@ -35,8 +35,8 @@ export const getVacantProperty = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
-export const uploadProperty = async(req, res, next) => {
-  const propertyData = await propertyServices.uploadProperty(req, res, next);
+export const getPropertyById = async(req, res, next) => {
+  const propertyData = await propertyServices.getPropertyById(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
 };
 
