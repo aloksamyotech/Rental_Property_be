@@ -5,6 +5,7 @@ import CustomError from "../utils/exception.js";
 import jwt from 'jsonwebtoken';
 import Owner from "../models/owner.model.js";
 import Booking from "../models/booking,model.js";
+import Company from "../models/company.model.js";
 
 
 
@@ -14,7 +15,7 @@ export const createProperty = async(req, res) => {
     typeId, 
     description, 
     address, 
-    zipcode, 
+    zipcode,
     maplink,
     rent,
     ownerId,
@@ -68,7 +69,7 @@ export const getProperty = async(req, res, next) => {
   const companyId = req.query.id;
   const Properties = await Property.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
   // if (!tenants || tenants.length === 0) {
-  if (!Properties  || Properties.length === 0) {
+  if (!Properties  ) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
@@ -79,42 +80,20 @@ export const getProperty = async(req, res, next) => {
     return Properties;
 };
 
-const getOneMonthBeforeRange = () => {
-  const currentDate = new Date();
-  
-  const startOfOneMonthAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, currentDate.getDate());  
 
-  const endOfOneMonthAgo = new Date(startOfOneMonthAgo);
-  endOfOneMonthAgo.setHours(23, 59, 59, 999); 
-
-  return { startOfOneMonthAgo, endOfOneMonthAgo };
+export const getVacantProperty = async(req, res, next) => {
+  const companyId = req.query.id;
+  const Properties = await Property.find({ companyId, isDeleted: false,isVacant: true }).sort({ createdAt: -1 });
+  if (!Properties ) {
+    return new CustomError(
+      statusCodes?.serviceUnavailable,
+      Message?.serverError,
+      errorCodes?.service_unavailable,
+    );
+  }
+  console.log("PropertiesPropertiesPropertiesProperties",Properties);
+    return Properties;
 };
-
-export const PropertyOnNotice = async (req, res, next) => {
-
-    const { id } = req.query;  
-
-    if (!id) {
-      return res.status(400).json({ message: 'Company ID is required' });
-    }
-
-    const { startOfOneMonthAgo, endOfOneMonthAgo } = getOneMonthBeforeRange();
-
-  
-    const bookings = await Booking.find({
-      companyId: id,  
-      bookingDate: {
-        $gte: startOfOneMonthAgo,  
-        $lte: endOfOneMonthAgo     
-      },
-      isDeleted: false          
-    });
-
-    return  bookings ;
-
-
-};
-
 
 
 export const deleteProperty = async (req, res) => {
@@ -133,6 +112,24 @@ export const deleteProperty = async (req, res) => {
   await property.save();
 
   return property
+};
+
+
+export const uploadProperty = (req, res) => {
+  const {id} = req.query;
+  const company = Company.findById(id);
+  if(!company){
+    return new CustomError(
+      statusCodes?.serviceUnavailable,
+      Message?.serverError,
+      errorCodes?.service_unavailable,
+    );
+  }
+  const Files = req.files;
+  if (!req.files === 0) {
+    return res.status(400).send('No files uploaded.');
+  }
+  return Files;
 };
 
 

@@ -14,6 +14,10 @@ const typeSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company"
     },
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true },
 );

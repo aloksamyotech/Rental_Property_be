@@ -35,3 +35,8 @@ export const breakTheBooking = async(req, res, next) => {
   const bookingData = await bookingServices.breakTheBooking(req, res);
   res.status(statusCodes?.created).send(bookingData);
 };
+
+export const PropertyOnNotice = async(req, res, next) => {
+  const propertyData = await bookingServices.vacantPropertyOnNotice(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
