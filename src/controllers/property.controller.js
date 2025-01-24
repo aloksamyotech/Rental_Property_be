@@ -40,3 +40,7 @@ export const getPropertyById = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
+export const getAllProperties = async(req, res, next) => {
+  const propertyData = await propertyServices.getAllProperties(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};

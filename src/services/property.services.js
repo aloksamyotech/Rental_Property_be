@@ -126,6 +126,20 @@ export const editProperty = async (req, res) => {
 
 export const getProperty = async(req, res, next) => {
   const companyId = req.query.id;
+  const Properties = await Property.find({ companyId, isDeleted: false , isVacant: true}).sort({ createdAt: -1 });
+  if (!Properties  ) {
+    return new CustomError(
+      statusCodes?.serviceUnavailable,
+      Message?.serverError,
+      errorCodes?.service_unavailable,
+    );
+  }
+    return Properties;
+};
+
+
+export const getAllProperties = async(req, res, next) => {
+  const companyId = req.query.id;
   const Properties = await Property.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
   if (!Properties  ) {
     return new CustomError(
@@ -182,10 +196,6 @@ export const getPropertyById = async (req, res) => {
       errorCodes?.not_found
     );
   } 
-
-  property.isDeleted = true;
-  await property.save();
-
   return property
 };
 

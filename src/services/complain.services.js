@@ -171,7 +171,7 @@ export const allComplainForCompany = async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  if (!allComplain || allComplain.length === 0) {
+  if (!allComplain) {
     throw new CustomError(
       statusCodes?.conflict,
       Message?.serverError,

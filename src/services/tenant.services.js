@@ -150,6 +150,7 @@ export const getTenants = async (req, res, next) => {
 
     const tenants = await Tenant.find({
       companyId,
+      isOccupied: false,
       isDeleted: false,
     }).sort({ createdAt: -1 });
 
@@ -250,6 +251,27 @@ export const deleteTenantById = async (req, res) => {
 
     return tenant
 };
+
+export const getAllTenants = async (req, res, next) => {
+  const { id: companyId } = req.query;
+
+  const tenants = await Tenant.find({
+    companyId,
+    isDeleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!tenants || tenants.length === 0) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No tenants found',
+      errorCodes?.not_found
+    );
+  }
+
+  return tenants;
+};
+
+
 
 export const getMyTenants = async (req, res) => {
   const id = req.query.id;

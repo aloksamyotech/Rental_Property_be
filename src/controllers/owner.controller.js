@@ -24,6 +24,16 @@ export const deleteOwner = async(req, res) => {
   res.status(statusCodes?.created).send(ownerData);
 };
 
+export const getOwnerById = async(req, res) => {
+  const ownerData = await ownerService.getOwnerById(req, res);
+  res.status(statusCodes?.created).send(ownerData);
+};
+
+export const getPropertyByOwnerId = async(req, res) => {
+  const ownerData = await ownerService.getPropertyByOwnerId(req, res);
+  res.status(statusCodes?.created).send(ownerData);
+};
+
 export const ownerLogin = async (req, res) => {
   const data = await ownerService.loginOwner(req, res);
   res

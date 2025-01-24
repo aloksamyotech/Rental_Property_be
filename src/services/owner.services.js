@@ -1,6 +1,7 @@
 import Owner from "../models/owner.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
+import Property from '../models/property.model.js'
 import Company from "../models/company.model.js";
 
 export const registerOwner = async (req, res) => {
@@ -41,6 +42,20 @@ export const registerOwner = async (req, res) => {
   return createdOwner;
 };
 
+export const getOwnerById = async (req, res) => {
+  const ownerId = req.query.id;
+
+  const property = await Owner.findById(ownerId);
+  if (!property) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || "Owner not found",
+      errorCodes?.not_found
+    );
+  } 
+  return property
+};
+
 export const getAllOwner = async (req) => {
   const companyId = req.query.id;
   if (!companyId) {
@@ -51,7 +66,7 @@ export const getAllOwner = async (req) => {
     );
   }
 
-  const allOwner = await Owner.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
+  const allOwner = await Owner.find({companyId:companyId, isDeleted: false}).sort({ createdAt: -1 });
 
   if (!allOwner) {
     throw new CustomError(
@@ -79,6 +94,20 @@ const generateAccessAndRefreshTokens = async (userId) => {
       errorCodes?.server_error
     );
   }
+};
+
+
+export const getPropertyByOwnerId = async(req, res, next) => {
+  const ownerId = req.query.id;
+  const Properties = await Property.find({ ownerId, isDeleted: false }).sort({ createdAt: -1 });
+  if (!Properties  ) {
+    return new CustomError(
+      statusCodes?.serviceUnavailable,
+      Message?.serverError,
+      errorCodes?.service_unavailable,
+    );
+  }
+    return Properties;
 };
 
 export const loginOwner = async (req, res) => {

@@ -6,11 +6,12 @@ const connectDB = async () => {
   try {
     (async function () {
       const dbUri = database_urls.connection + database_urls.db_name;
+      console.log(dbUri,
+        "dburi"
+      )
       await mongoose.connect(dbUri, {
-        // useNewUrlParser: true,
+        //   useNewUrlParser: true,
         // useUnifiedTopology: true,
-        // useCreateIndex: true,
-        // useFindAndModify: false,
       });
     })();
   } catch (error) {
