@@ -252,6 +252,30 @@ export const deleteTenantById = async (req, res) => {
     return tenant
 };
 
+
+export const getTenantsById = async (req, res, next) => {
+    const { id } = req.query;
+
+    if (!id) {
+      throw new CustomError(
+        statusCodes?.badRequest,
+        "Tenant ID is required",
+        errorCodes?.invalid_request
+      );
+    }
+ const tenant = await Tenant.findById(id);
+
+    if (!tenant) {
+      throw new CustomError(
+        statusCodes?.notFound,
+        Message?.notFound || "No tenant found",
+        errorCodes?.not_found
+      );
+    }
+
+    return tenant;
+};
+
 export const getAllTenants = async (req, res, next) => {
   const { id: companyId } = req.query;
 

@@ -188,14 +188,26 @@ export const deleteProperty = async (req, res) => {
 export const getPropertyById = async (req, res) => {
   const propertyId = req.query.id;
 
-  const property = await Property.findById(propertyId);
+  // const booking = await Booking.findById(id)
+  // .populate("tenantId")
+  // .populate("propertyId")
+  // .populate("companyId")
+  // .sort({ createdAt: -1 })
+  // .lean();
+
+  const property = await Property.findById(propertyId)
+  .populate("typeId")
+  .populate("ownerId")
+  .sort({ createdAt: -1 })
+  .lean();
+
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound || "Tenant not found",
       errorCodes?.not_found
     );
-  } 
+  }
   return property
 };
 
