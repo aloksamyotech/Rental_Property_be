@@ -29,7 +29,7 @@ const propertySchema = new Schema(
       type: String
     },
     isDeleted: {
-      type: String,
+      type: Boolean,
       default: false
     },
     ownerId:{
