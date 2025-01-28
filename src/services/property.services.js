@@ -8,57 +8,58 @@ import Booking from "../models/booking,model.js";
 import Company from "../models/company.model.js";
 
 
+export const createProperty = async (req, res) => {
+    const {
+      propertyname,
+      typeId,
+      description,
+      address,
+      zipcode,
+      maplink,
+      rent,
+      ownerId,
+      companyId,
+    } = req.body;
 
-export const createProperty = async(req, res) => {
-  const {
-    propertyname, 
-    typeId, 
-    description,
-    address, 
-    zipcode,
-    maplink,
-    rent,
-    ownerId,
-    companyId
-  } = req.body;
+    const isPropertyAlreadyExist = await Property.findOne({ propertyname });
+    if (isPropertyAlreadyExist) {
+      return new CustomError(
+        statusCodes?.notFound,
+        Message?.notFound,
+        errorCodes?.not_found,
+      );
+    }
 
-  const isPropertyAlreadyExist = await Property.findOne({ propertyname });
-  if (isPropertyAlreadyExist) {
-    throw new CustomError(
-      statusCodes?.conflict,
-      Message?.alreadyExist,
-      errorCodes?.already_exist,
-    );
-  }
-
-     let filePath = null;
-    
-     if (req.files && req.files.length > 0) {
-       const index = 0; 
-       if (req.files[index] && req.files[index].filename) {
+    let filePath = null;
+    if (req.files && req.files.length > 0) {
+      const index = 0;
+      if (req.files[index] && req.files[index].filename) {
         filePath = `uploads/property/${req.files[index].filename}`;
-       } else {
-         return res.status(400).json({
-           message: "File upload failed",
-           errorCode: "file_upload_error",
-         });
-       }
-     }
-  const property = await Property.create({
-    propertyname, 
-    typeId, 
-    description, 
-    address, 
-    zipcode, 
-    maplink,
-    rent,
-    ownerId,
-    companyId,
-    files: filePath
-  });
+      } else {
+        return new CustomError(
+          statusCodes?.notFound,
+          Message?.notFound,
+          errorCodes?.not_found,
+        );
+      }
+    }
 
-  return property;
+    const property = await Property.create({
+      propertyname,
+      typeId,
+      description,
+      address,
+      zipcode,
+      maplink,
+      rent,
+      ownerId,
+      companyId,
+      files: filePath, 
+    });
+
+    return property
 };
+
 
 export const editProperty = async (req, res) => {
     const propertyId = req.query.id;

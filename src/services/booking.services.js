@@ -190,7 +190,7 @@ export const getAllBooking = async (req) => {
   if (!allBooking) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.noDataFound,
+      Message?.notFound,
       errorCodes?.no_data_found
     );
   }

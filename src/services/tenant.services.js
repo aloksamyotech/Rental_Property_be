@@ -142,7 +142,6 @@ export const loginTenant = async (req, res) => {
 //       );
 //     }
 //     return tenants
-
 // };
 
 export const getTenants = async (req, res, next) => {
@@ -273,7 +272,19 @@ export const getTenantsById = async (req, res, next) => {
       );
     }
 
-    return tenant;
+  const bookings = await Booking.find({ tenantId:id })
+  .populate("propertyId");
+
+  const formattedBookings = bookings.map((bookingData) => ({
+    propertyName: bookingData.propertyId?.propertyname , 
+    description: bookingData.propertyId?.description,
+    rent: bookingData.propertyId?.rent,
+    address: bookingData.propertyId.address
+  }));
+    return {
+      tenant, 
+      booking : formattedBookings
+    };
 };
 
 export const getAllTenants = async (req, res, next) => {
