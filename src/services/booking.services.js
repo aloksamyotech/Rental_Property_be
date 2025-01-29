@@ -136,7 +136,6 @@ export const getBookingById = async(req) =>{
 export const breakTheBooking = async (req) => {
   const { id } = req.query;
 
-  // Fetch the booking
   const booking = await Booking.findById(id);
   if (!booking) {
     throw new CustomError(

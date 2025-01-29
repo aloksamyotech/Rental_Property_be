@@ -7,61 +7,65 @@ import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 
-
 export const createTenant = async (req) => {
+  console.log(req.body,"req.body")
 
-  const { 
-    tenantName,
-    email,
-    password,
-    phoneno,
-    identityCardType,
-    identityNo,
-    identityImage,
-    emergencyNo,
-    address,
-    reporterId,
-    companyId
-  } = req.body;
+    const {
+      tenantName,
+      email,
+      password,
+      phoneno,
+      identityCardType,
+      identityNo,
+      address,
+      reporterId,
+      companyId,
+    } = req.body;
 
-  const isTenantAlreadyExist = await Tenant.findOne({ email });
+    const existingTenant = await Tenant.findOne({ email });
 
-  if (isTenantAlreadyExist) {
-    throw new CustomError(
-      statusCodes?.conflict,
-      Message?.alreadyExist,
-      errorCodes?.already_exist
+    if (existingTenant) {
+      throw new CustomError(
+        statusCodes?.conflict,
+        Message?.alreadyExist,
+        errorCodes?.already_exist
+      );
+    }
+
+    let filePaths = [];
+    if (req.files && req.files.length > 0) {
+      filePaths = req.files.map((file) => `uploads/${file.filename}`);
+    }
+
+    const tenant = await Tenant.create({
+      tenantName,
+      email,
+      password, 
+      phoneno,
+      identityCardType,
+      identityNo,
+      document: filePaths,
+      address,
+      reporterId,
+      companyId,
+    });
+
+    if (!tenant) {
+      throw new CustomError(
+        statusCodes?.serviceUnavailable,
+        Message?.serverError,
+        errorCodes?.service_unavailable
+      );
+    }
+
+    const createdTenant = await Tenant.findById(tenant._id).select(
+      "-password -refreshToken"
     );
-  }
 
-  const tenant = await Tenant.create({
-    tenantName,
-    email,
-    password,
-    phoneno,
-    identityCardType,
-    identityNo,
-    identityImage,
-    emergencyNo,
-    address,
-    reporterId,
-    companyId
-  });
+    return createdTenant;
 
-  const createdTenant = await Tenant.findById(tenant._id).select(
-    "-password -refreshToken"
-  );
-
-  if (!createdTenant) {
-    return new CustomError(
-      statusCodes?.serviceUnavailable,
-      Message?.serverError,
-      errorCodes?.service_unavailable
-    );
-  }
-
-  return createdTenant;
 };
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -127,11 +131,8 @@ export const loginTenant = async (req, res) => {
 };
 
 // export const getTenants = async (req, res, next) => {
-
 //     const companyId = req.query.id;
-
 //     const tenants = await Tenant.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
-
 //     if (!tenants || tenants.length === 0) {
 //       return next(
 //         new CustomError(

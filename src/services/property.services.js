@@ -30,18 +30,9 @@ export const createProperty = async (req, res) => {
       );
     }
 
-    let filePath = null;
+    let filePaths = [];
     if (req.files && req.files.length > 0) {
-      const index = 0;
-      if (req.files[index] && req.files[index].filename) {
-        filePath = `uploads/property/${req.files[index].filename}`;
-      } else {
-        return new CustomError(
-          statusCodes?.notFound,
-          Message?.notFound,
-          errorCodes?.not_found,
-        );
-      }
+      filePaths = req.files.map(file => `uploads/${file.filename}`);
     }
 
     const property = await Property.create({
@@ -54,7 +45,7 @@ export const createProperty = async (req, res) => {
       rent,
       ownerId,
       companyId,
-      files: filePath, 
+      files: filePaths, 
     });
 
     return property
