@@ -142,7 +142,6 @@ export const loginTenant = async (req, res) => {
 //       );
 //     }
 //     return tenants
-
 // };
 
 export const getTenants = async (req, res, next) => {
@@ -250,6 +249,42 @@ export const deleteTenantById = async (req, res) => {
     await tenant.save();
 
     return tenant
+};
+
+
+export const getTenantsById = async (req, res, next) => {
+    const { id } = req.query;
+
+    if (!id) {
+      throw new CustomError(
+        statusCodes?.badRequest,
+        "Tenant ID is required",
+        errorCodes?.invalid_request
+      );
+    }
+ const tenant = await Tenant.findById(id);
+
+    if (!tenant) {
+      throw new CustomError(
+        statusCodes?.notFound,
+        Message?.notFound || "No tenant found",
+        errorCodes?.not_found
+      );
+    }
+
+  const bookings = await Booking.find({ tenantId:id })
+  .populate("propertyId");
+
+  const formattedBookings = bookings.map((bookingData) => ({
+    propertyName: bookingData.propertyId?.propertyname , 
+    description: bookingData.propertyId?.description,
+    rent: bookingData.propertyId?.rent,
+    address: bookingData.propertyId.address
+  }));
+    return {
+      tenant, 
+      booking : formattedBookings
+    };
 };
 
 export const getAllTenants = async (req, res, next) => {

@@ -16,6 +16,7 @@ import companyRoutes from './src/routes/company.routes.js';
 import ownerRoutes from './src/routes/owner.routes.js';
 import complainRoutes from './src/routes/complain.routes.js';
 import typeRoutes from './src/routes/type.routes.js';
+import path from "path";
 
 const app = express();
 const PORT = (() => {
@@ -25,7 +26,7 @@ const PORT = (() => {
 
 app.use(express.json());
 app.use(corsConfig);
-
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use((req, res, next) => {
     logger.info(`Incoming request: ${req.method} ${req.originalUrl}`);
     next();
