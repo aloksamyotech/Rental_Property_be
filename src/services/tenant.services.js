@@ -21,7 +21,7 @@ export const createTenant = async (req) => {
       reporterId,
       companyId,
     } = req.body;
-
+  
     const existingTenant = await Tenant.findOne({ email });
 
     if (existingTenant) {
@@ -44,7 +44,7 @@ export const createTenant = async (req) => {
       phoneno,
       identityCardType,
       identityNo,
-      document: filePaths,
+      files: filePaths,
       address,
       reporterId,
       companyId,

@@ -22,7 +22,7 @@ const tenantSchema = new Schema(
     identityNo: {
       type: String
     },
-    document:  {
+    files:  {
       type: [String] 
     },
     address:{
