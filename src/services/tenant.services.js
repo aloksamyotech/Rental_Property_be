@@ -8,7 +8,6 @@ import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 
 export const createTenant = async (req) => {
-  console.log(req.body,"req.body")
 
     const {
       tenantName,
