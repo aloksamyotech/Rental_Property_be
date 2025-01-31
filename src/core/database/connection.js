@@ -10,7 +10,7 @@ const connectDB = async () => {
       const connection = await mongoose.connect(dbUri, {});
       if (connection) {
         const existingAdmin = await User.findOne({
-          email: "admin@gmail.com",
+          email: "admin@samyotech.com",
         });
         if (!existingAdmin) {
           const userData = new User({
