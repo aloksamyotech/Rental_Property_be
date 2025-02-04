@@ -17,6 +17,7 @@ import ownerRoutes from './src/routes/owner.routes.js';
 import complainRoutes from './src/routes/complain.routes.js';
 import typeRoutes from './src/routes/type.routes.js';
 import path from "path";
+import mongoose from 'mongoose';
 
 const app = express();
 const PORT = (() => {
@@ -32,6 +33,8 @@ app.use((req, res, next) => {
     next();
 });
 
+// await mongoose.connect('mongodb+srv://rental_property:rental_property%40samyotech2024@cluster0.kv1f8.mongodb.net/rms?retryWrites=true&w=majority&appName=Cluster0')
+console.log('database connected successfully');
 connectDB()
     .then(() => {
         logger.info('Database connected successfully');

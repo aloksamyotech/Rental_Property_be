@@ -139,7 +139,7 @@ export const getTenants = async (req, res, next) => {
       isDeleted: false,
     }).sort({ createdAt: -1 });
 
-    if (!tenants || tenants.length === 0) {
+    if (!tenants) {
       throw new CustomError(
         statusCodes?.notFound,
         Message?.notFound || 'No tenants found',
