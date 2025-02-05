@@ -1,16 +1,14 @@
-const mongoose = require('mongoose');
-const { Schema } = mongoose;
+import mongoose,{ Schema } from "mongoose";
+
 
 const billSchema = new Schema({
   tenantId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Tenant', 
-    required: true 
+    ref: 'Tenant'
   },
   propertyId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Property', 
-    required: true 
+    ref: 'Property'
   },
   billingMonth: { 
     type: Date, 
@@ -48,19 +46,13 @@ const billSchema = new Schema({
   createdBy: { 
     type: mongoose.Schema.Types.ObjectId, 
   },
+  note:{
+    type: String
+  },
   companyId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Company',
-    required: true 
+    ref: 'Company'
   },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  },
-  updatedAt: { 
-    type: Date, 
-    default: Date.now 
-  }
 },
 { timestamps: true },
 );

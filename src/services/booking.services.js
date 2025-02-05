@@ -6,6 +6,7 @@ import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 import Tenant from "../models/tenant.model.js";
+import Bill from "../models/billing.model.js";
 
 
 export const createBooking = async (req, res) => {

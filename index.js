@@ -16,6 +16,7 @@ import companyRoutes from './src/routes/company.routes.js';
 import ownerRoutes from './src/routes/owner.routes.js';
 import complainRoutes from './src/routes/complain.routes.js';
 import typeRoutes from './src/routes/type.routes.js';
+import billRoutes from './src/routes/bill.routes.js'
 import path from "path";
 import mongoose from 'mongoose';
 
@@ -48,6 +49,7 @@ app.use(responseInterceptor);
 // app.use('/api/v1/user', userRouter)
 app.use('/api/v1/complain', complainRoutes);
 app.use('/api/v1/property', propertyRouter);
+app.use('/api/v1/bill', billRoutes);
 app.use('/api/v1/booking', bookingRoutes)
 app.use('/api/v1/agent', agentRoutes);
 app.use('/api/v1/tenant', tenantRoutes);
