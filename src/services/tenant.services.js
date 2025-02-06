@@ -161,7 +161,7 @@ export const mybooking = async (req, res, next) => {
   .sort({ createdAt: -1 })
   .lean();
 
-  if (!tenantBooking || tenantBooking.length === 0) {
+  if (!tenantBooking) {
     throw new CustomError(
       statusCodes?.badRequest,
       "Tenant ID is required.",
@@ -281,7 +281,7 @@ export const getAllTenants = async (req, res, next) => {
     isDeleted: false,
   }).sort({ createdAt: -1 });
 
-  if (!tenants || tenants.length === 0) {
+  if (!tenants ) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound || 'No tenants found',

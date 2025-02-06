@@ -7,3 +7,14 @@ export const createbill = async(req, res, next) => {
   const billData = await billServices.createbill(req, res);
   res.status(statusCodes?.created).send(billData);
 };
+
+export const getAllBill = async(req, res, next) => {
+  const billData = await billServices.getAllBill(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+
+export const getBillForT = async(req, res, next) => {
+  const billData = await billServices.getBillByT(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
