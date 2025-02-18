@@ -16,8 +16,10 @@ import companyRoutes from './src/routes/company.routes.js';
 import ownerRoutes from './src/routes/owner.routes.js';
 import complainRoutes from './src/routes/complain.routes.js';
 import typeRoutes from './src/routes/type.routes.js';
-import billRoutes from './src/routes/bill.routes.js'
+import billRoutes from './src/routes/bill.routes.js';
+import serviceProviderRoutes from './src/routes/serviceProvider.routes.js';
 import path from "path";
+import AnnouncementRoutes from './src/routes/announcment.routes.js';
 import mongoose from 'mongoose';
 
 const app = express();
@@ -57,6 +59,8 @@ app.use('/api/v1/owner', ownerRoutes);
 app.use('/api/v1/company', companyRoutes);
 app.use('/api/v1/types', typeRoutes);
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/serviceProvider', serviceProviderRoutes);
+app.use('/api/v1/announcement', AnnouncementRoutes);
 
 app.use(globalExceptionHandler);
 

@@ -76,5 +76,5 @@ export const getAllTypes = async (req, res) => {
         errorCodes?.service_unavailable,
       );
     }
-      return updateType;
+    return updateType;
   };

@@ -53,7 +53,7 @@ export const createProperty = async (req, res) => {
 
 
 export const editProperty = async (req, res) => {
-    const propertyId = req.query.id;
+      const propertyId = req.query.id;
 
     if (!propertyId) {
       return res.status(400).json({
