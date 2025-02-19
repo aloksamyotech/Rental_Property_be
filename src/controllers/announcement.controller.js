@@ -21,6 +21,11 @@ export const getAllAnnouncement = async(req, res, next) => {
   res.status(statusCodes?.created).send(announcement);
 };
 
+export const getAnnouncementById = async(req, res, next) => {
+  const announcement = await announcementServices.getAnnouncementById(req, res);
+  res.status(statusCodes?.created).send(announcement);
+};
+
 export const deleteAnnounment = async(req, res, next) => {
   const announcement = await announcementServices.deleteAnnounment(req, res);
   res.status(statusCodes?.created).send(announcement);

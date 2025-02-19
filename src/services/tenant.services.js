@@ -1,8 +1,7 @@
 
 import Tenant from "../models/tenant.model.js";
-import { errorCodes, statusCodes } from "../core/common/constant.js";
+import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
-import { Message } from "../core/common/constant.js";
 import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
