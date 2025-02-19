@@ -24,6 +24,10 @@ export const editAgent = async(req, res, next) => {
   res.status(statusCodes?.created).send(agentData);
 };
 
+export const getAgentById = async(req, res, next) => {
+  const agentData = await agentServices.getAgentById(req, res);
+  res.status(statusCodes?.created).send(agentData);
+};
 
 export const getAllAgent = async(req, res, next) => {
   const agentData = await agentServices.getAllAgent(req, res);

@@ -11,6 +11,11 @@ export const createBooking = async(req, res, next) => {
   res.status(statusCodes?.created).send(bookingData);
 };
 
+export const createbill = async(req, res, next) => {
+  const bookingData = await bookingServices.createbill(req, res);
+  res.status(statusCodes?.created).send(bookingData);
+};
+
 export const getBooking = async(req, res, next) => {
   const bookingData = await bookingServices.getBooking(req, res);
   res.status(statusCodes?.created).send(bookingData);

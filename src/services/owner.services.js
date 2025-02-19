@@ -99,7 +99,9 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 export const getPropertyByOwnerId = async(req, res, next) => {
   const ownerId = req.query.id;
-  const Properties = await Property.find({ ownerId, isDeleted: false }).sort({ createdAt: -1 });
+  const Properties = await Property.find({ ownerId, isDeleted: false })
+  .populate('typeId')
+  .sort({ createdAt: -1 });
   if (!Properties  ) {
     return new CustomError(
       statusCodes?.serviceUnavailable,

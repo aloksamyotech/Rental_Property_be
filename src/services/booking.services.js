@@ -6,6 +6,7 @@ import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 import Tenant from "../models/tenant.model.js";
+import Bill from "../models/billing.model.js";
 
 
 export const createBooking = async (req, res) => {
@@ -136,7 +137,6 @@ export const getBookingById = async(req) =>{
 export const breakTheBooking = async (req) => {
   const { id } = req.query;
 
-  // Fetch the booking
   const booking = await Booking.findById(id);
   if (!booking) {
     throw new CustomError(

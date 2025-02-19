@@ -6,11 +6,11 @@ import "dotenv/config";
 const connectDB = async () => {
   try {
     (async function () {
-      const dbUri = database_urls.connection + database_urls.db_name;
+      const dbUri = database_urls.connection ;
       const connection = await mongoose.connect(dbUri, {});
       if (connection) {
         const existingAdmin = await User.findOne({
-          email: "admin@gmail.com",
+          email: "admin@samyotech.com",
         });
         if (!existingAdmin) {
           const userData = new User({

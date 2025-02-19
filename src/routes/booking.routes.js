@@ -4,10 +4,11 @@ const router = Router();
 import { createAgent ,editAgent, agentLogin} from "../controllers/agent.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 // import { createBooking } from "../services/booking.services.js";
-import { createBooking, getAllBooking,editBooking,getBooking ,getBookingById,breakTheBooking,PropertyOnNotice} from "../controllers/booking.controller.js";
+import { createBooking, getAllBooking,editBooking,getBooking ,getBookingById,breakTheBooking,PropertyOnNotice,createbill} from "../controllers/booking.controller.js";
 
 
 router.post("/create", asyncHandler(createBooking));
+router.post("/createBill", asyncHandler(createbill));
 router.put("/editBooking", asyncHandler(editBooking));
 router.get("/getBooking", asyncHandler(getBooking));
 router.get("/allBooking", asyncHandler(getAllBooking));
