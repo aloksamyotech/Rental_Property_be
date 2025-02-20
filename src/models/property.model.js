@@ -26,7 +26,8 @@ const propertySchema = new Schema(
       type: String
     },
     rent:{
-      type: String
+      type: Number,
+      min: 0 
     },
     isDeleted: {
       type: Boolean,

@@ -22,11 +22,8 @@ const tenantSchema = new Schema(
     identityNo: {
       type: String
     },
-    identityImage: {
-      type: String
-    },
-    emergencyNo:{
-      type: String
+    files:  {
+      type: [String] 
     },
     address:{
       type: String

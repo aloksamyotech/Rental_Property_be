@@ -5,34 +5,34 @@ import jwt from "jsonwebtoken";
 const agentSchema = new Schema(
   {
     agentName: {
-      type: String
+      type: String,
     },
     email: {
-      type: String
+      type: String,
     },
     password: {
-      type: String
+      type: String,
     },
     phoneNo: {
-      type: String
+      type: String,
     },
     role: {
       type: String,
-      default:"agent"
+      default: "agent",
     },
     address: {
-      type: String
+      type: String,
     },
     isDeleted: {
       type: String,
-      default: false
+      default: false,
     },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company"
-   },
+      ref: "Company",
+    },
     refreshToken: {
-      type: String
+      type: String,
     },
   },
   { timestamps: true }
@@ -56,7 +56,7 @@ agentSchema.methods.generateAccessToken = function () {
     companyId: this.companyId,
     role: this.role,
     email: this.email,
-    name : this.agentName
+    name: this.agentName,
   };
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
@@ -70,7 +70,7 @@ agentSchema.methods.generateRefreshToken = function () {
     companyId: this.companyId,
     role: this.role,
     email: this.email,
-    name : this.agentName
+    name: this.agentName,
   };
 
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {

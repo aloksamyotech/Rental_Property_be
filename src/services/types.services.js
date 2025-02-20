@@ -1,7 +1,6 @@
 import Type from "../models/types.model.js";
-import { errorCodes, statusCodes } from "../core/common/constant.js";
+import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
-import { Message } from "../core/common/constant.js";
 
 export const createType = async (req, res) => {
   const { name, description, companyId } = req.body;
@@ -76,5 +75,5 @@ export const getAllTypes = async (req, res) => {
         errorCodes?.service_unavailable,
       );
     }
-      return updateType;
+    return updateType;
   };

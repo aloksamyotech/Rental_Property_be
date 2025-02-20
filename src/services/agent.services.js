@@ -2,6 +2,7 @@ import Agent from "../models/agents.model.js";
 import Property from "../models/property.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
+import Booking from "../models/booking,model.js";
 import Tenant from "../models/tenant.model.js";
 
 export const createAgent = async (req, res) => {
@@ -159,4 +160,40 @@ export const deleteAgent = async (req, res) => {
 
   return agent
 };
+
+export const getAgentById = async (req, res) => {
+
+    const agentId = req.query.id;
+    const agent = await Agent.findById(agentId);
+
+    if (!agent) {
+      throw new CustomError(
+        statusCodes?.notFound,
+        Message?.notFound || "Agent not found",
+        errorCodes?.not_found
+      );
+    }
+
+    const bookings = await Booking.find({ createdBy: agentId })
+      .populate("propertyId")
+      .populate("tenantId");
+
+  //   const formattedBookings = bookings.map((bookingData) => ({
+  //     propertyName: bookingData.propertyId?.propertyname,
+  //     description: bookingData.propertyId?.description,
+  //     rent: bookingData.propertyId?.rent,
+  //     address: bookingData.propertyId?.address
+  // }));
+
+  const  tenant = await Tenant.find({reporterId:agentId});
+
+  return {
+    agent,
+    bookings,
+    // booking: formattedBookings,
+    tenant
+  }
+
+}
+
 
