@@ -2,6 +2,58 @@ import Bill from "../models/billing.model.js";
 import Property from "../models/property.model.js";
 import Tenant from "../models/tenant.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
+import CustomError from "../utils/exception.js";
+// export const createbill = async (req, res) => {
+//   const {
+//     tenantId,
+//     propertyId,
+//     billingMonth,
+//     rentAmount,
+//     extraAmount,
+//     electricityUnit,
+//     electricityRate,
+//     electricityBillAmount,
+//     totalBillAmount,
+//     companyId,
+//     note
+//   } = req.body;
+
+//   const totalExtraAmount = extraCharges.reduce((sum, charge) => sum + charge.price, 0);
+
+//   const newBill = await Bill.create({
+//     tenantId,
+//     propertyId,
+//     billingMonth,
+//     rentAmount,
+//     extraAmount:totalExtraAmount,
+//     electricityUnit,
+//     electricityRate,
+//     electricityBillAmount,
+//     totalBillAmount,
+//     companyId,
+//     note
+//   });
+
+//   const property = await Property.findById(propertyId);
+//   if (!property) {
+//     throw new CustomError(
+//       statusCodes?.notFound,
+//       Message?.notFound,
+//       errorCodes?.not_found
+//     );
+//   }
+
+//   const tenant = await Tenant.findById(tenantId);
+//   if (!tenant) {
+//     throw new CustomError(
+//       statusCodes?.notFound,
+//       Message?.notFound,
+//       errorCodes?.not_found
+//     );
+//   }
+  
+//   return newBill;
+// };
 
 export const createbill = async (req, res) => {
   const {
@@ -9,27 +61,31 @@ export const createbill = async (req, res) => {
     propertyId,
     billingMonth,
     rentAmount,
-    extraAmount,
+    extraCharges = [],
     electricityUnit,
+    extraAmount,
     electricityRate,
     electricityBillAmount,
     totalBillAmount,
     companyId,
-    note
+    note,
   } = req.body;
+
+  // const totalExtraAmount = extraCharges.reduce((sum, charge) => sum + charge.price, 0);
 
   const newBill = await Bill.create({
     tenantId,
     propertyId,
     billingMonth,
     rentAmount,
-    extraAmount,
+    extraAmount, 
+    extraCharges, 
     electricityUnit,
     electricityRate,
     electricityBillAmount,
     totalBillAmount,
     companyId,
-    note
+    note,
   });
 
   const property = await Property.findById(propertyId);
@@ -49,7 +105,7 @@ export const createbill = async (req, res) => {
       errorCodes?.not_found
     );
   }
-  
+
   return newBill;
 };
 

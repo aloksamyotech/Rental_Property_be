@@ -1,4 +1,5 @@
 import mongoose,{ Schema } from "mongoose";
+import { isNumberObject } from "util/types";
 
 
 const billSchema = new Schema({
@@ -18,13 +19,18 @@ const billSchema = new Schema({
     type: Number, 
     min: 0 
   },
+  extraCharges: [
+    {
+      serviceName: { type: String },
+      price: { type: Number},
+    },
+  ],
   extraAmount: { 
     type: Number, 
-    min: 0 
+    min: 0
   },
   electricityUnit: { 
     type: Number, 
-   
     min: 0 
   },
   electricityRate: { 
