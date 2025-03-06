@@ -7,7 +7,7 @@ import Tenant from "../models/tenant.model.js";
 import Complaint from "../models/complaints.model.js";
 
 export const companyRegistration = async (req) => {
-  const { companyName, email, password, phoneNo, address } = req.body;
+  const { companyName, email, password, phoneNo, address , currencyCode} = req.body;
   const isCompanyAlreadyExist = await Company.findOne({ email });
 
   if (isCompanyAlreadyExist) {
@@ -24,6 +24,7 @@ export const companyRegistration = async (req) => {
     password,
     phoneNo,
     address,
+    currencyCode
   });
 
   const createdCompany = await Company.findById(company._id).select(

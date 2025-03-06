@@ -17,6 +17,7 @@ export const createProperty = async (req, res) => {
       zipcode,
       maplink,
       rent,
+      area,
       ownerId,
       companyId,
     } = req.body;
@@ -43,6 +44,7 @@ export const createProperty = async (req, res) => {
       zipcode,
       maplink,
       rent,
+      area,
       ownerId,
       companyId,
       files: filePaths, 
@@ -70,6 +72,7 @@ export const editProperty = async (req, res) => {
       zipcode,
       maplink,
       rent,
+      area,
       ownerId,
       companyId,
     } = req.body;
@@ -95,6 +98,7 @@ export const editProperty = async (req, res) => {
       zipcode,
       maplink,
       rent,
+      area,
       ownerId,
       companyId,
       ...(filePath && { files: filePath }),

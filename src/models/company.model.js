@@ -23,6 +23,9 @@ const companySchema = new Schema(
     address: {
       type: String
     },
+    currencyCode: {
+      type: String,
+    },
     isDeleted: {
       type: Boolean,
       default: false
