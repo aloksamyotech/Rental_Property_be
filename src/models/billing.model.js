@@ -45,6 +45,9 @@ const billSchema = new Schema({
     type: Number, 
     min: 0 
   },
+  invoiceNo: { 
+    type: String, 
+  },
   billDuration: { 
     type: Number, 
     min: 1 

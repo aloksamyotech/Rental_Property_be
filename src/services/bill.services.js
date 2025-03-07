@@ -3,6 +3,7 @@ import Property from "../models/property.model.js";
 import Tenant from "../models/tenant.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
+import crypto from 'crypto';
 // export const createbill = async (req, res) => {
 //   const {
 //     tenantId,
@@ -71,7 +72,19 @@ export const createbill = async (req, res) => {
     note,
   } = req.body;
 
-  // const totalExtraAmount = extraCharges.reduce((sum, charge) => sum + charge.price, 0);
+  const billingDate = new Date(billingMonth);
+  const formattedBillingMonth = `${billingDate.toLocaleString('default', { month: 'long' }).toUpperCase()}`;
+  
+  const generateInvoiceNumber = () => {
+    const prefix = "INV";
+    const year = new Date().getFullYear().toString().slice(-2); 
+    const randomNumbers = Math.floor(100 + Math.random() * 900);
+    return `${prefix}${year}${formattedBillingMonth}${randomNumbers}`;
+  };
+  
+
+  const invoiceNo = generateInvoiceNumber();
+
 
   const newBill = await Bill.create({
     tenantId,
@@ -79,7 +92,8 @@ export const createbill = async (req, res) => {
     billingMonth,
     rentAmount,
     extraAmount, 
-    extraCharges, 
+    extraCharges,
+    invoiceNo:invoiceNo, 
     electricityUnit,
     electricityRate,
     electricityBillAmount,
@@ -87,6 +101,7 @@ export const createbill = async (req, res) => {
     companyId,
     note,
   });
+
 
   const property = await Property.findById(propertyId);
   if (!property) {
@@ -143,4 +158,21 @@ export const getBillByT = async(req) =>{
     );
   }
   return tenantBill
+}
+
+export const getBillById = async(req) =>{
+  const billId = req.query.id;
+  const bill = await Bill.findById(billId)
+  .populate("tenantId")
+  .populate("propertyId")
+  .populate("companyId")
+
+  if (!bill ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return bill
 }

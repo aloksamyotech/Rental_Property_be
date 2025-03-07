@@ -23,6 +23,9 @@ const companySchema = new Schema(
     address: {
       type: String
     },
+    gstnumber: {
+      type: String
+    },
     currencyCode: {
       type: String,
     },

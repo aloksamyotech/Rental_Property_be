@@ -7,7 +7,7 @@ import Tenant from "../models/tenant.model.js";
 import Complaint from "../models/complaints.model.js";
 
 export const companyRegistration = async (req) => {
-  const { companyName, email, password, phoneNo, address , currencyCode} = req.body;
+  const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
   const isCompanyAlreadyExist = await Company.findOne({ email });
 
   if (isCompanyAlreadyExist) {
@@ -24,7 +24,8 @@ export const companyRegistration = async (req) => {
     password,
     phoneNo,
     address,
-    currencyCode
+    currencyCode,
+    gstnumber
   });
 
   const createdCompany = await Company.findById(company._id).select(
@@ -207,6 +208,21 @@ export const getAllCompany = async (req) => {
   }
 
   return AllComp;
+};
+
+export const getCompanyById = async (req) => {
+  const companyId = req.query.id;
+  const companyDetails = await Company.findById(companyId);
+
+  if (!companyDetails) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  return companyDetails;
 };
 
 export const editCompany = async (req, res, next) => {
