@@ -1,7 +1,7 @@
 import Bill from "../models/billing.model.js";
 import Property from "../models/property.model.js";
 import Tenant from "../models/tenant.model.js";
-import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
+import { errorCodes, invoicePrefix, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import crypto from 'crypto';
 // export const createbill = async (req, res) => {
@@ -76,15 +76,13 @@ export const createbill = async (req, res) => {
   const formattedBillingMonth = `${billingDate.toLocaleString('default', { month: 'long' }).toUpperCase()}`;
   
   const generateInvoiceNumber = () => {
-    const prefix = "INV";
+    const prefix = invoicePrefix.prefix;
     const year = new Date().getFullYear().toString().slice(-2); 
     const randomNumbers = Math.floor(100 + Math.random() * 900);
     return `${prefix}${year}${formattedBillingMonth}${randomNumbers}`;
   };
-  
 
   const invoiceNo = generateInvoiceNumber();
-
 
   const newBill = await Bill.create({
     tenantId,

@@ -158,7 +158,6 @@ export const getVacantProperty = async(req, res, next) => {
       errorCodes?.service_unavailable,
     );
   }
-  console.log("PropertiesPropertiesPropertiesProperties",Properties);
     return Properties;
 };
 

@@ -11,7 +11,6 @@ export const companyRegistration = async (req, res) => {
 
 export const universalLogin = async (req, res) => {
   const data = await companyServices.universalLogin(req, res);
-  console.log("....................................>>>>>>>>>>>>>>>", data);
   res
     .status(statusCodes?.ok)
     .cookie("accessToken", data?.accessToken, data?.options)
