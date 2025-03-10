@@ -66,10 +66,13 @@ export const createbill = async (req, res) => {
     electricityUnit,
     extraAmount,
     electricityRate,
+    gstpercent,
     electricityBillAmount,
     totalBillAmount,
     companyId,
     note,
+    totalBillAmountAfterGST,
+    totalgst
   } = req.body;
 
   const billingDate = new Date(billingMonth);
@@ -91,6 +94,7 @@ export const createbill = async (req, res) => {
     rentAmount,
     extraAmount, 
     extraCharges,
+    gstpercent,
     invoiceNo:invoiceNo, 
     electricityUnit,
     electricityRate,
@@ -98,6 +102,8 @@ export const createbill = async (req, res) => {
     totalBillAmount,
     companyId,
     note,
+    totalBillAmountAfterGST,
+    totalgst
   });
 
 
@@ -174,3 +180,42 @@ export const getBillById = async(req) =>{
   }
   return bill
 }
+
+export const reporterDetails = async(req) =>{
+  const repoterId = req.query.id;
+  const bill = await Bill.findById(repoterId)
+  .populate("tenantId")
+  .populate("propertyId")
+  .populate("companyId")
+
+  if (!bill ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return bill
+}
+
+
+export const changeBillStatus = async (req) => {
+  const billId = req.query.id;
+  const { paymentType } = req.body; 
+
+  const bill = await Bill.findById(billId);
+
+  if (!bill) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  
+  bill.status = true;
+  bill.paymentType = paymentType; 
+
+  await bill.save();
+  return bill;
+};

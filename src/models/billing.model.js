@@ -62,6 +62,23 @@ const billSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Company'
   },
+  totalBillAmountAfterGST:{
+    type: Number
+  },
+  totalgst:{
+    type: Number
+  },
+  status:{
+    type: Boolean,
+    default: false
+
+  },
+  paymentType:{
+    type: String,
+  },
+  gstPercent:{
+    type: Number
+  }
 },
 { timestamps: true },
 );

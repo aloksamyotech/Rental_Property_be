@@ -13,6 +13,16 @@ export const getAllBill = async(req, res, next) => {
   res.status(statusCodes?.created).send(billData);
 };
 
+export const changeBillStatus = async(req, res, next) => {
+  const billData = await billServices.changeBillStatus(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const reporterDetails = async(req, res, next) => {
+  const billData = await billServices.reporterDetails(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
 export const getBillForT = async(req, res, next) => {
   const billData = await billServices.getBillByT(req, res);
   res.status(statusCodes?.created).send(billData);

@@ -217,8 +217,8 @@ export const getCompanyById = async (req) => {
   if (!companyDetails) {
     throw new CustomError(
       statusCodes?.conflict,
-      Message?.alreadyExist,
-      errorCodes?.already_exist
+      Message?.notFound,
+      errorCodes?.not_found
     );
   }
 
