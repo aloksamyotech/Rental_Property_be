@@ -5,6 +5,7 @@ import CustomError from "../utils/exception.js";
 import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
+import TenantDocs from "../models/tenantDocs.model.js";
 
 export const createTenant = async (req) => {
 
@@ -18,7 +19,11 @@ export const createTenant = async (req) => {
       address,
       reporterId,
       companyId,
+      documents
     } = req.body;
+    
+// console.log("------------------------------------",documents);
+//     console.log(req.files,"req.files");
   
     const existingTenant = await Tenant.findOne({ email });
 
@@ -30,10 +35,18 @@ export const createTenant = async (req) => {
       );
     }
 
-    let filePaths = [];
-    if (req.files && req.files.length > 0) {
-      filePaths = req.files.map((file) => `uploads/${file.filename}`);
-    }
+    // let filePaths = [];
+    // if (req.files && req.files.length > 0) {
+    //   filePaths = req.files.map((file) => `uploads/tenant/${file.filename}`);
+    // }
+
+    console.log(req.files,"files")
+
+    const uploadedFiles = req.files.map((file) => ({
+      filetype: file.mimetype,
+      name: file.originalname,
+      url: `uploads/tenant/${file.filename}`, 
+    }));
 
     const tenant = await Tenant.create({
       tenantName,
@@ -42,7 +55,7 @@ export const createTenant = async (req) => {
       phoneno,
       identityCardType,
       identityNo,
-      files: filePaths,
+      files: uploadedFiles,
       address,
       reporterId,
       companyId,
@@ -290,6 +303,49 @@ export const getAllTenants = async (req, res, next) => {
 
   return tenants;
 };
+
+
+export const getAllDocs = async (req, res, next) => {
+  const { id: tenantId } = req.query;
+
+  const tenantsDocs = await TenantDocs.find({
+    tenantId,
+    // isDeleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!tenantsDocs ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Document found',
+      errorCodes?.not_found
+    );
+  }
+
+  return tenantsDocs;
+};
+
+export const uploadDocuments = async (req, res, next) => {
+  const tenantId = req.query.id;
+
+  const {name} = req.body;
+
+  const document = await TenantDocs.create({
+    tenantId,
+    documentName:name,
+    url:  `uploads/tenant/${req.file.filename}`, 
+  });
+
+  if (!document ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Document found',
+      errorCodes?.not_found
+    );
+  }
+
+  return document;
+};
+
 
 
 
