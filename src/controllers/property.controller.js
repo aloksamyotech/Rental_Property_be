@@ -15,8 +15,19 @@ export const editProperty = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
+
+export const uploadImages = async(req, res, next) => {
+  const propertyData = await propertyServices.uploadImages(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
+
 export const getProperty = async(req, res, next) => {
   const propertyData = await propertyServices.getProperty(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
+
+export const getAllImages = async(req, res, next) => {
+  const propertyData = await propertyServices.getAllImages(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
 };
 

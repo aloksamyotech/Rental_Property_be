@@ -305,6 +305,7 @@ export const getAllTenants = async (req, res, next) => {
 };
 
 
+
 export const getAllDocs = async (req, res, next) => {
   const { id: tenantId } = req.query;
 
@@ -325,14 +326,14 @@ export const getAllDocs = async (req, res, next) => {
 };
 
 export const uploadDocuments = async (req, res, next) => {
-  const tenantId = req.query.id;
+  // const tenantId = req.query.id;
 
-  const {name} = req.body;
+  const {name,tenantId} = req.body;
 
   const document = await TenantDocs.create({
     tenantId,
     documentName:name,
-    url:  `uploads/tenant/${req.file.filename}`, 
+    url:  `uploads/${req.file.filename}`, 
   });
 
   if (!document ) {

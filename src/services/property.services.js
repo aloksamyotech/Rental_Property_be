@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import Owner from "../models/owner.model.js";
 import Booking from "../models/booking,model.js";
 import Company from "../models/company.model.js";
+import PropertyImg from "../models/propertyImages.model.js";
 
 
 export const createProperty = async (req, res) => {
@@ -120,6 +121,48 @@ export const editProperty = async (req, res) => {
   
 };
 
+export const uploadImages = async (req, res, next) => {
+  // const tenantId = req.query.id;
+
+  const {name,propertyId} = req.body;
+
+  const document = await PropertyImg.create({
+    propertyId,
+    documentName:name,
+    url:  `uploads/${req.file.filename}`, 
+  });
+
+  if (!document ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Document found',
+      errorCodes?.not_found
+    );
+  }
+
+  return document;
+};
+
+export const getAllImages = async (req, res, next) => {
+  const { id: propertyId } = req.query;
+
+  const propertyImg = await PropertyImg.find({
+    propertyId,
+    // isDeleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!propertyImg ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Property Images found',
+      errorCodes?.not_found
+    );
+  }
+
+  return propertyImg;
+};
+
+
 export const getProperty = async(req, res, next) => {
   const companyId = req.query.id;
   const Properties = await Property.find({ companyId, isDeleted: false , isVacant: true}).sort({ createdAt: -1 });
@@ -160,7 +203,6 @@ export const getVacantProperty = async(req, res, next) => {
   }
     return Properties;
 };
-
 
 export const deleteProperty = async (req, res) => {
   const propertyId = req.query.id;
