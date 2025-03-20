@@ -179,7 +179,9 @@ export const getProperty = async(req, res, next) => {
 
 export const getAllProperties = async(req, res, next) => {
   const companyId = req.query.id;
-  const Properties = await Property.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
+  const Properties = await Property.find({ companyId, isDeleted: false })
+  .populate("typeId")
+  .sort({ createdAt: -1 });
   if (!Properties  ) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
@@ -220,6 +222,22 @@ export const deleteProperty = async (req, res) => {
   await property.save();
 
   return property
+};
+
+
+export const deletePropertyImg = async (req, res) => {
+  const propertyId = req.query.id;
+
+  const property = await PropertyImg.findByIdAndDelete(propertyId);
+    
+  if (!property) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || "Image not found",
+      errorCodes?.not_found
+    );
+  }
+  return property;
 };
 
 export const getPropertyById = async (req, res) => {

@@ -4,22 +4,35 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Booking from "../models/booking,model.js";
 import Tenant from "../models/tenant.model.js";
+import Company from "../models/company.model.js";
 
 export const createAgent = async (req, res) => {
 
 
 const { agentName, email, password, phoneNo, address, companyId } = req.body;
+    
+      const [isCompanyAlreadyExist, isAgentAlreadyExist, isStudentAlreadyExist] = await Promise.all([
+        Company.findOne({ email , isDeleted: false }),
+        Agent.findOne({ email  , isDeleted: false }),
+        Tenant.findOne({ email ,isDeleted: false})
+      ]);
+      
+      if (isCompanyAlreadyExist || isAgentAlreadyExist || isStudentAlreadyExist) {
+        throw new CustomError(
+          statusCodes?.conflict,
+          Message?.alreadyExist,
+          errorCodes?.already_exist
+        )
+      }
 
-
-    const isAgentAlreadyExist = await Agent.findOne({ email });
-
-    if (isAgentAlreadyExist) {
-      throw new CustomError(
-        statusCodes?.conflict,
-        Message?.alreadyExist,
-        errorCodes?.already_exist,
-      );
-    }
+    // const isAgentAlreadyExist = await Agent.findOne({ email });
+    // if (isAgentAlreadyExist) {
+    //   throw new CustomError(
+    //     statusCodes?.conflict,
+    //     Message?.alreadyExist,
+    //     errorCodes?.already_exist,
+    //   );
+    // }
 
     const newAgent = await Agent.create({
       agentName,

@@ -4,7 +4,7 @@ const router = Router();
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 //LandLord Routes........................................................
 // import { userLogin,userRegistration } from "../controllers/user.controller.js";
-import { complainRegistration,allComplain ,editComplain,deleteComplain,getTenantReporter,allComplainForCompany,resolveComplain,getComplainById, addCommentToComplain} from "../controllers/complaint.controller.js";
+import { complainRegistration,allComplain ,editComplain,deleteComplain,getTenantReporter,allComplainForCompany,resolveComplain,getComplainById, addCommentToComplain,getAllComplainCompanyAgent} from "../controllers/complaint.controller.js";
 
 router.post("/register", asyncHandler(complainRegistration));
 router.get("/allComplain", asyncHandler(allComplain));
@@ -16,5 +16,10 @@ router.get("/getComplainById", asyncHandler(getComplainById));
 
 router.patch("/resolveComplain",asyncHandler(resolveComplain));
 router.patch("/addCommentToComplain",asyncHandler(addCommentToComplain))
+
+router.get("/getAllComplainCompanyAgent", asyncHandler(getAllComplainCompanyAgent));
+
+
+
 
 export default router;

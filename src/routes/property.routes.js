@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncWrapper.js";
 const router = Router();
-import { createProperty,editProperty,getProperty,deleteProperty,getVacantProperty,getPropertyById,getAllProperties,uploadImages,getAllImages} from "../controllers/property.controller.js";
+import { createProperty,editProperty,getProperty,deleteProperty,getVacantProperty,getPropertyById,getAllProperties,uploadImages,getAllImages,deletePropertyImg} from "../controllers/property.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { upload } from "../core/config/multer.js";
 //LandLord Routes........................................................
@@ -17,6 +17,6 @@ router.get("/getAllProperties", asyncHandler(getAllProperties));
 
 router.post("/uploadImages", upload.single('files'), asyncHandler(uploadImages));
 router.get("/getAllImages", asyncHandler(getAllImages));
-
+router.delete("/deleteImg", asyncHandler(deletePropertyImg));
 
 export default router;

@@ -74,7 +74,8 @@ tenantSchema.methods.generateAccessToken = function () {
     email: this.email,
     role: this.role,
     companyId: this.companyId,
-    name: this.tenantName
+    name: this.tenantName,
+    reporterId :this.reporterId
   };
 
   const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {

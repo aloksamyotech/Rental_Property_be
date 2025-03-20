@@ -63,3 +63,8 @@ export const uploadDocuments = async(req, res, next) => {
   const tenantData = await tenantServices.uploadDocuments(req, res, next);
   res.status(statusCodes?.created).send(tenantData);
 };
+
+export const deleteTenantDocs = async(req, res, next) => {
+  const tenantData = await tenantServices.deleteTenantDocs(req, res, next);
+  res.status(statusCodes?.created).send(tenantData);
+};

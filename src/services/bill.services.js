@@ -1,9 +1,16 @@
 import Bill from "../models/billing.model.js";
 import Property from "../models/property.model.js";
 import Tenant from "../models/tenant.model.js";
-import { errorCodes, invoicePrefix, Message, statusCodes } from "../core/common/constant.js";
+import {
+  errorCodes,
+  invoicePrefix,
+  Message,
+  statusCodes,
+} from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
-import crypto from 'crypto';
+import crypto from "crypto";
+import Agent from "../models/agents.model.js";
+import Company from "../models/company.model.js";
 // export const createbill = async (req, res) => {
 //   const {
 //     tenantId,
@@ -52,7 +59,7 @@ import crypto from 'crypto';
 //       errorCodes?.not_found
 //     );
 //   }
-  
+
 //   return newBill;
 // };
 
@@ -72,15 +79,18 @@ export const createbill = async (req, res) => {
     companyId,
     note,
     totalBillAmountAfterGST,
-    totalgst
+    totalgst,
+    createdBy
   } = req.body;
 
   const billingDate = new Date(billingMonth);
-  const formattedBillingMonth = `${billingDate.toLocaleString('default', { month: 'long' }).toUpperCase()}`;
-  
+  const formattedBillingMonth = `${billingDate
+    .toLocaleString("default", { month: "long" })
+    .toUpperCase()}`;
+
   const generateInvoiceNumber = () => {
     const prefix = invoicePrefix.prefix;
-    const year = new Date().getFullYear().toString().slice(-2); 
+    const year = new Date().getFullYear().toString().slice(-2);
     const randomNumbers = Math.floor(100 + Math.random() * 900);
     return `${prefix}${year}${formattedBillingMonth}${randomNumbers}`;
   };
@@ -92,10 +102,10 @@ export const createbill = async (req, res) => {
     propertyId,
     billingMonth,
     rentAmount,
-    extraAmount, 
+    extraAmount,
     extraCharges,
     gstpercent,
-    invoiceNo:invoiceNo, 
+    invoiceNo: invoiceNo,
     electricityUnit,
     electricityRate,
     electricityBillAmount,
@@ -103,9 +113,9 @@ export const createbill = async (req, res) => {
     companyId,
     note,
     totalBillAmountAfterGST,
-    totalgst
+    totalgst,
+    createdBy
   });
-
 
   const property = await Property.findById(propertyId);
   if (!property) {
@@ -130,10 +140,13 @@ export const createbill = async (req, res) => {
 
 export const getAllBill = async (req) => {
   const companyId = req.query.id;
-  const AllBill = await Bill.find({companyId:companyId})
-  .populate("tenantId", "tenantName")
-  .populate("propertyId", "propertyname")
-  .sort({ createdAt: -1 })
+  const AllBill = await Bill.find(
+    {  companyId: companyId, isDeleted: false  }
+  )
+    .populate("tenantId", "tenantName")
+    .populate("propertyId", "propertyname")
+    .lean()
+    .sort({ createdAt: -1 });
 
   if (!AllBill) {
     throw new CustomError(
@@ -143,65 +156,99 @@ export const getAllBill = async (req) => {
     );
   }
 
-  return AllBill;
+  
+    const finalResponse = [];
+    for (const bill of AllBill) {
+      const createdBy = bill.createdBy;
+  
+      let creater = await Agent.findById(createdBy);
+      let name;
+      if (creater) {
+        name = creater.agentName;
+      } else {
+        creater = await Company.findById(createdBy);
+        if (creater) {
+          name = creater.companyName;
+        }
+      }
+      finalResponse.push({ name, ...bill });
+    }
+
+  return finalResponse;
 };
 
 
-export const getBillByT = async(req) =>{
+export const getBillByT = async (req) => {
   const tenantId = req.query.id;
-  const tenantBill = await Bill.find({tenantId: tenantId})
-  .populate("tenantId")
-  .populate("propertyId")
-  .sort({ createdAt: -1 })
+  const tenantBill = await Bill.find({ tenantId: tenantId , isDeleted: false})
+    .populate("tenantId")
+    .populate("propertyId")
+    .sort({ createdAt: -1 });
 
-  if (!tenantBill ) {
+  if (!tenantBill) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound,
       errorCodes?.no_data_found
     );
   }
-  return tenantBill
-}
+  return tenantBill;
+};
 
-export const getBillById = async(req) =>{
+export const getBillById = async (req) => {
   const billId = req.query.id;
   const bill = await Bill.findById(billId)
-  .populate("tenantId")
-  .populate("propertyId")
-  .populate("companyId")
+    .populate("tenantId")
+    .populate("propertyId")
+    .populate("companyId");
 
-  if (!bill ) {
+  if (!bill) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound,
       errorCodes?.no_data_found
     );
   }
-  return bill
-}
+  return bill;
+};
 
-export const reporterDetails = async(req) =>{
+export const getBillByCreaterBy =  async (req) => {
+  const AgentId = req.query.id;
+  const bill = await Bill.find({createdBy:AgentId})
+    .populate("tenantId")
+    .populate("propertyId")
+    .populate("companyId");
+
+  if (!bill) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return bill;
+};
+
+export const reporterDetails = async (req) => {
   const repoterId = req.query.id;
   const bill = await Bill.findById(repoterId)
-  .populate("tenantId")
-  .populate("propertyId")
-  .populate("companyId")
+    .populate("tenantId")
+    .populate("propertyId")
+    .populate("companyId");
 
-  if (!bill ) {
+  if (!bill) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound,
       errorCodes?.no_data_found
     );
   }
-  return bill
-}
-
+  return bill;
+};
 
 export const changeBillStatus = async (req) => {
   const billId = req.query.id;
-  const { paymentType } = req.body; 
+  const { paymentType } = req.body;
 
   const bill = await Bill.findById(billId);
 
@@ -212,10 +259,29 @@ export const changeBillStatus = async (req) => {
       errorCodes?.no_data_found
     );
   }
-  
+
   bill.status = true;
-  bill.paymentType = paymentType; 
+  bill.paymentType = paymentType;
 
   await bill.save();
+  return bill;
+};
+
+export const deleteBill = async (req, res) => {
+  const billId = req.query.id;
+  console.log(billId, "billIdbillIdbillIdbillId");
+
+  const bill = await Bill.findById(billId);
+  if (!bill) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || "Bill not found",
+      errorCodes?.not_found
+    );
+  }
+
+  bill.isDeleted = true;
+  await bill.save();
+
   return bill;
 };

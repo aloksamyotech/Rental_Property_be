@@ -1,4 +1,5 @@
 import mongoose,{ Schema } from "mongoose";
+import { type } from "os";
 import { isNumberObject } from "util/types";
 
 
@@ -62,6 +63,9 @@ const billSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Company'
   },
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+  },
   totalBillAmountAfterGST:{
     type: Number
   },
@@ -71,13 +75,16 @@ const billSchema = new Schema({
   status:{
     type: Boolean,
     default: false
-
   },
   paymentType:{
     type: String,
   },
-  gstPercent:{
+  gstpercent:{
     type: Number
+  },
+  isDeleted:{
+    type: Boolean,
+    default: false
   }
 },
 { timestamps: true },

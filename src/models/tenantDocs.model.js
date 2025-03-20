@@ -13,7 +13,7 @@ const tenatnDocsSchema = new Schema(
     tenantId:{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant"
-    },
+    }
   },
   { timestamps: true },
 );

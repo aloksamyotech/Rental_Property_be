@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncWrapper.js";
 const router = Router();
 import { upload } from "../core/config/multer.js";
 
-import { createTenant ,tenantLogin, getTenants, editTenant, getTenantsById, deleteTenantById,mybookings,getMyTenants,getAllTenants,uploadDocuments,getAllDocs} from "../controllers/tenant.controller.js";
+import { createTenant ,tenantLogin, getTenants, editTenant, getTenantsById, deleteTenantById,mybookings,getMyTenants,getAllTenants,uploadDocuments,getAllDocs,deleteTenantDocs} from "../controllers/tenant.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 router.post("/register", upload.array('files', 10), asyncHandler(createTenant));
@@ -18,6 +18,7 @@ router.get("/getAllTenants", asyncHandler(getAllTenants));
 
 router.post("/tenantDoc", upload.single('files'), asyncHandler(uploadDocuments));
 router.get("/getAllDocs", asyncHandler(getAllDocs));
+router.delete("/deleteDoc",asyncHandler(deleteTenantDocs) )
 
 
 export default router;
