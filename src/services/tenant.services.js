@@ -5,6 +5,7 @@ import CustomError from "../utils/exception.js";
 import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
+import TenantDocs from "../models/tenantDocs.model.js";
 
 export const createTenant = async (req) => {
 
@@ -18,22 +19,48 @@ export const createTenant = async (req) => {
       address,
       reporterId,
       companyId,
+      documents
     } = req.body;
+    
+// console.log("------------------------------------",documents);
+//     console.log(req.files,"req.files");
+
+const [isCompanyAlreadyExist, isAgentAlreadyExist, isStudentAlreadyExist] = await Promise.all([
+  Company.findOne({ email , isDeleted: false }),
+  Agent.findOne({ email  , isDeleted: false }),
+  Tenant.findOne({ email ,isDeleted: false})
+]);
+
+if (isCompanyAlreadyExist || isAgentAlreadyExist || isStudentAlreadyExist) {
+  throw new CustomError(
+    statusCodes?.conflict,
+    Message?.alreadyExist,
+    errorCodes?.already_exist
+  )
+}
   
-    const existingTenant = await Tenant.findOne({ email });
+    // const existingTenant = await Tenant.findOne({ email });
 
-    if (existingTenant) {
-      throw new CustomError(
-        statusCodes?.conflict,
-        Message?.alreadyExist,
-        errorCodes?.already_exist
-      );
-    }
+    // if (existingTenant) {
+    //   throw new CustomError(
+    //     statusCodes?.conflict,
+    //     Message?.alreadyExist,
+    //     errorCodes?.already_exist
+    //   );
+    // }
 
-    let filePaths = [];
-    if (req.files && req.files.length > 0) {
-      filePaths = req.files.map((file) => `uploads/${file.filename}`);
-    }
+    // let filePaths = [];
+    // if (req.files && req.files.length > 0) {
+    //   filePaths = req.files.map((file) => `uploads/tenant/${file.filename}`);
+    // }
+
+    console.log(req.files,"files")
+
+    const uploadedFiles = req.files.map((file) => ({
+      filetype: file.mimetype,
+      name: file.originalname,
+      url: `uploads/tenant/${file.filename}`, 
+    }));
 
     const tenant = await Tenant.create({
       tenantName,
@@ -42,7 +69,7 @@ export const createTenant = async (req) => {
       phoneno,
       identityCardType,
       identityNo,
-      files: filePaths,
+      files: uploadedFiles,
       address,
       reporterId,
       companyId,
@@ -278,7 +305,9 @@ export const getAllTenants = async (req, res, next) => {
   const tenants = await Tenant.find({
     companyId,
     isDeleted: false,
-  }).sort({ createdAt: -1 });
+  })
+  .lean()
+  .sort({ createdAt: -1 });
 
   if (!tenants ) {
     throw new CustomError(
@@ -288,14 +317,77 @@ export const getAllTenants = async (req, res, next) => {
     );
   }
 
-  return tenants;
+  const finalResponse = [];
+  for (const tenat of tenants) {
+    const reporterId = tenat.reporterId;
+
+    let creater = await Agent.findById(reporterId);
+    let Creater;
+    if (creater) {
+      Creater = creater.agentName;
+    } else {
+      creater = await Company.findById(reporterId);
+      if (creater) {
+        Creater = creater.companyName;
+      }
+    }
+    finalResponse.push({ Creater, ...tenat });
+  }
+
+  return finalResponse;
 };
+
+
+
+export const getAllDocs = async (req, res, next) => {
+  const { id: tenantId } = req.query;
+
+  const tenantsDocs = await TenantDocs.find({
+    tenantId,
+    // isDeleted: false,
+  }).sort({ createdAt: -1 });
+
+  if (!tenantsDocs ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Document found',
+      errorCodes?.not_found
+    );
+  }
+
+  return tenantsDocs;
+};
+
+export const uploadDocuments = async (req, res, next) => {
+  // const tenantId = req.query.id;
+
+  const {name,tenantId} = req.body;
+
+  const document = await TenantDocs.create({
+    tenantId,
+    documentName:name,
+    url:  `uploads/${req.file.filename}`, 
+  });
+
+  if (!document ) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || 'No Document found',
+      errorCodes?.not_found
+    );
+  }
+
+  return document;
+};
+
 
 
 
 export const getMyTenants = async (req, res) => {
   const id = req.query.id;
-  const tenant = await Tenant.find({reporterId:id ,isDeleted: false}).sort({ createdAt: -1 });
+  const tenant = await Tenant.find({reporterId:id ,isDeleted: false})
+  .lean()
+  .sort({ createdAt: -1 });
   if (!tenant) {
     throw new CustomError(
       statusCodes?.notFound,
@@ -303,5 +395,39 @@ export const getMyTenants = async (req, res) => {
       errorCodes?.not_found
     );
   }
-  return tenant;
+
+   const finalResponse = [];
+    for (const tenat of tenant) {
+      const reporterId = tenat.reporterId;
+  
+      let creater = await Agent.findById(reporterId);
+      let Creater;
+      if (creater) {
+        Creater = creater.agentName;
+      } else {
+        creater = await Company.findById(reporterId);
+        if (creater) {
+          Creater = creater.companyName;
+        }
+      }
+      finalResponse.push({ Creater, ...tenat });
+    }
+  return finalResponse;
+};
+
+
+
+export const deleteTenantDocs = async (req, res) => {
+  const tenantId = req.query.id;
+
+  const tenantDocs = await TenantDocs.findByIdAndDelete(tenantId);
+    
+  if (!tenantDocs) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound || "Image not found",
+      errorCodes?.not_found
+    );
+  }
+  return tenantDocs;
 };

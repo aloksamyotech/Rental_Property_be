@@ -51,4 +51,11 @@ export const addCommentToComplain = async (req, res) => {
 };
 
 
+export const getAllComplainCompanyAgent = async (req, res) => {
+  const complainData = await complainServices.getAllComplainCompanyAgent(req, res);
+  res.status(statusCodes?.created).send(complainData);
+};
+
+
+
 

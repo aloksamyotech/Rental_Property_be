@@ -9,11 +9,9 @@ import Company from "../models/company.model.js";
 
 export const authMiddleware = asyncHandler(async (req, res, next) => {
   let token;
-  console.log(req.headers.token,"reqreqrreq");
   if (req?.headers?.token) {
     token = req?.headers?.token;
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(decoded,"decodeddecodeddecodeddecodeddecoded");
     const authenticatedUser = await Company.findById(decoded._id);
 
     if (!authenticatedUser) {

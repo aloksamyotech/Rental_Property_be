@@ -1,4 +1,6 @@
 import mongoose,{ Schema } from "mongoose";
+import { type } from "os";
+import { isNumberObject } from "util/types";
 
 
 const billSchema = new Schema({
@@ -18,13 +20,18 @@ const billSchema = new Schema({
     type: Number, 
     min: 0 
   },
+  extraCharges: [
+    {
+      serviceName: { type: String },
+      price: { type: Number},
+    },
+  ],
   extraAmount: { 
     type: Number, 
-    min: 0 
+    min: 0
   },
   electricityUnit: { 
     type: Number, 
-   
     min: 0 
   },
   electricityRate: { 
@@ -38,6 +45,9 @@ const billSchema = new Schema({
   totalBillAmount: { 
     type: Number, 
     min: 0 
+  },
+  invoiceNo: { 
+    type: String, 
   },
   billDuration: { 
     type: Number, 
@@ -53,6 +63,29 @@ const billSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Company'
   },
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+  },
+  totalBillAmountAfterGST:{
+    type: Number
+  },
+  totalgst:{
+    type: Number
+  },
+  status:{
+    type: Boolean,
+    default: false
+  },
+  paymentType:{
+    type: String,
+  },
+  gstpercent:{
+    type: Number
+  },
+  isDeleted:{
+    type: Boolean,
+    default: false
+  }
 },
 { timestamps: true },
 );

@@ -11,7 +11,6 @@ export const companyRegistration = async (req, res) => {
 
 export const universalLogin = async (req, res) => {
   const data = await companyServices.universalLogin(req, res);
-  console.log("....................................>>>>>>>>>>>>>>>", data);
   res
     .status(statusCodes?.ok)
     .cookie("accessToken", data?.accessToken, data?.options)
@@ -22,6 +21,16 @@ export const universalLogin = async (req, res) => {
 export const getAllCompany = async (req, res) => {
   const companyData = await companyServices.getAllCompany(req, res);
   res.status(statusCodes?.created).send(companyData);
+};
+
+export const getCompanyById = async (req, res) => {
+  const getCurrency = await companyServices.getCompanyById(req, res);
+  res.status(statusCodes?.created).send(getCurrency);
+};
+
+export const currency = async (req, res) => {
+  const currency = await companyServices.currency(req, res);
+  res.status(statusCodes?.created).send(currency);
 };
 
 export const editCompany = async (req, res) => {

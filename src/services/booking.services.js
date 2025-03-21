@@ -216,6 +216,7 @@ export const getAllBooking = async (req) => {
 
 
 export const vacantPropertyOnNotice = async (req, res) => {
+  const { id } = req.query;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0); 
@@ -229,6 +230,7 @@ export const vacantPropertyOnNotice = async (req, res) => {
         $gte: today, 
         $lte: after15Days,
       },
+      companyId: id ,
       isDeleted: false, 
     }).populate("propertyId tenantId companyId"); 
   

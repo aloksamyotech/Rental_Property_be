@@ -22,9 +22,16 @@ const tenantSchema = new Schema(
     identityNo: {
       type: String
     },
-    files:  {
-      type: [String] 
-    },
+    // files:  {
+    //   type: [String] 
+    // },
+    files: [
+      {
+        name:{type: String},
+        filetype: { type: String },
+        url: { type: String}
+      },
+    ],
     address:{
       type: String
     },
@@ -67,7 +74,8 @@ tenantSchema.methods.generateAccessToken = function () {
     email: this.email,
     role: this.role,
     companyId: this.companyId,
-    name: this.tenantName
+    name: this.tenantName,
+    reporterId :this.reporterId
   };
 
   const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {

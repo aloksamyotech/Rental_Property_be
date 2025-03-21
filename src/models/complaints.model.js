@@ -19,9 +19,9 @@ const complaintSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tenant"
     },
-    AgentId: {
+    agentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Company"
+      ref:"Agent"
     },
     concernTopic:{
       type: String,

@@ -7,16 +7,31 @@ import Tenant from "../models/tenant.model.js";
 import Complaint from "../models/complaints.model.js";
 
 export const companyRegistration = async (req) => {
-  const { companyName, email, password, phoneNo, address } = req.body;
-  const isCompanyAlreadyExist = await Company.findOne({ email });
+  const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
+  // const isCompanyAlreadyExist = await Company.findOne({ email });
 
-  if (isCompanyAlreadyExist) {
+  const [isCompanyAlreadyExist, isAgentAlreadyExist, isStudentAlreadyExist] = await Promise.all([
+    Company.findOne({ email , isDeleted: false }),
+     Agent.findOne({ email  , isDeleted: false }),
+     Tenant.findOne({ email ,isDeleted: false})
+  ]);
+  
+  if (isCompanyAlreadyExist || isAgentAlreadyExist || isStudentAlreadyExist) {
     throw new CustomError(
       statusCodes?.conflict,
       Message?.alreadyExist,
       errorCodes?.already_exist
-    );
+    )
   }
+  
+
+  // if (isCompanyAlreadyExist) {
+  //   throw new CustomError(
+  //     statusCodes?.conflict,
+  //     Message?.alreadyExist,
+  //     errorCodes?.already_exist
+  //   );
+  // }
 
   const company = await Company.create({
     companyName,
@@ -24,6 +39,8 @@ export const companyRegistration = async (req) => {
     password,
     phoneNo,
     address,
+    currencyCode,
+    gstnumber
   });
 
   const createdCompany = await Company.findById(company._id).select(
@@ -38,6 +55,7 @@ export const companyRegistration = async (req) => {
     );
   }
   return createdCompany;
+
 };
 
 // export const companyLogin = async (req, res) => {
@@ -92,10 +110,10 @@ export const universalLogin = async (req, res) => {
 
   let user = null;
 
-  const company = await Company.findOne({ email });
-  const agent = await Agent.findOne({ email });
-  const tenant = await Tenant.findOne({ email });
-
+  const company = await Company.findOne({ email, isDeleted: false });
+  const agent = await Agent.findOne({ email, isDeleted: false });
+  const tenant = await Tenant.findOne({ email, isDeleted: false });
+  
   if (company) {
     user = company;
   } else if (agent) {
@@ -206,6 +224,21 @@ export const getAllCompany = async (req) => {
   }
 
   return AllComp;
+};
+
+export const getCompanyById = async (req) => {
+  const companyId = req.query.id;
+  const companyDetails = await Company.findById(companyId);
+
+  if (!companyDetails) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.notFound,
+      errorCodes?.not_found
+    );
+  }
+
+  return companyDetails;
 };
 
 export const editCompany = async (req, res, next) => {

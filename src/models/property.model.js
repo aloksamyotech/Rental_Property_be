@@ -29,6 +29,10 @@ const propertySchema = new Schema(
       type: Number,
       min: 0 
     },
+    area:{
+      type: Number,
+      min: 0 
+    },
     isDeleted: {
       type: Boolean,
       default: false

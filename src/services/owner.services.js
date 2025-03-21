@@ -5,7 +5,6 @@ import Property from '../models/property.model.js'
 import Company from "../models/company.model.js";
 
 export const registerOwner = async (req, res) => {
-  console.log(`req`, req.body);
 
   const { ownerName, email, password, phoneNo, address, companyId } = req.body;
 

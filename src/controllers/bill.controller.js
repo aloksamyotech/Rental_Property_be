@@ -13,8 +13,32 @@ export const getAllBill = async(req, res, next) => {
   res.status(statusCodes?.created).send(billData);
 };
 
+export const getBillByCreaterBy = async(req, res, next) => {
+  const billData = await billServices.getBillByCreaterBy(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+export const changeBillStatus = async(req, res, next) => {
+  const billData = await billServices.changeBillStatus(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const reporterDetails = async(req, res, next) => {
+  const billData = await billServices.reporterDetails(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
 
 export const getBillForT = async(req, res, next) => {
   const billData = await billServices.getBillByT(req, res);
   res.status(statusCodes?.created).send(billData);
 };
+
+export const getBillById = async(req, res, next) => {
+  const billData = await billServices.getBillById(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const deleteBill = async(req, res, next) => {
+  const billData = await billServices.deleteBill(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+

@@ -5,6 +5,11 @@ export const database_urls = Object.freeze({
   db_name: process.env.DB_NAME || "heyreach",
 });
 
+export const invoicePrefix = Object.freeze({
+  prefix: process.env.PREFIX ,
+
+});
+
 export const statusCodes = {
   ok: 200,
   created: 201,

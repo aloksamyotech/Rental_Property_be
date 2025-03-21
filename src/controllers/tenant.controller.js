@@ -24,6 +24,11 @@ export const getMyTenants = async(req, res, next) => {
   res.status(statusCodes?.created).send(TenantData);
 };
 
+export const getAllDocs = async(req, res, next) => {
+  const TenantData = await tenantServices.getAllDocs(req, res, next);
+  res.status(statusCodes?.created).send(TenantData);
+};
+
 export const mybookings = async(req, res, next) => {
   const bookingData = await tenantServices.mybooking(req, res, next);
   res.status(statusCodes?.created).send(bookingData);
@@ -52,4 +57,14 @@ export const getTenants = async(req, res, next) => {
 export const getAllTenants = async(req, res, next) => {
   const propertyData = await tenantServices.getAllTenants(req, res, next);
   res.status(statusCodes?.created).send(propertyData);
+};
+
+export const uploadDocuments = async(req, res, next) => {
+  const tenantData = await tenantServices.uploadDocuments(req, res, next);
+  res.status(statusCodes?.created).send(tenantData);
+};
+
+export const deleteTenantDocs = async(req, res, next) => {
+  const tenantData = await tenantServices.deleteTenantDocs(req, res, next);
+  res.status(statusCodes?.created).send(tenantData);
 };

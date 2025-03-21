@@ -13,13 +13,23 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+  const allowedTypes = [
+    "image/jpeg",    // JPEG images
+    "image/png",     // PNG images
+    "application/pdf", // PDF files
+    "application/msword", // Word documents (.doc)
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Word documents (.docx)
+    "application/vnd.ms-excel", // Excel files (.xls)
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" // Excel files (.xlsx)
+  ];
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only images and PDF files are allowed"), false);
+    cb(new Error("Only image, PDF, Word, and Excel files are allowed"), false);
   }
 };
+
 
 export const upload = multer({
   storage,

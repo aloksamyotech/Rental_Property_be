@@ -8,6 +8,36 @@ import Company from "../models/company.model.js";
 
 export const complainRegistration = async (req, res) => {
 
+  const { tenantName,propertyId,complainersId, companyId, tenantId, agentId, concernTopic, description } = req.body;
+
+  const isComplainAlreadyExist = await Complaint.findOne({ concernTopic });
+
+  if (isComplainAlreadyExist) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  const complain = await Complaint.create({
+    tenantName,
+    complainersId,
+    propertyId,
+    companyId,
+    tenantId,
+    agentId,
+    concernTopic,
+    description,
+  });
+
+  return complain;
+};
+
+
+
+export const complainAgentRegistration = async (req, res) => {
+
   const { tenantName,propertyId, companyId, tenantId, agentId, concernTopic, description } = req.body;
 
   const isComplainAlreadyExist = await Complaint.findOne({ concernTopic });
@@ -33,7 +63,56 @@ export const complainRegistration = async (req, res) => {
   return complain;
 };
 
+// export const allComplain = async (req) => {
+//   const tenantId = req.query.id;
+//   if (!tenantId) {
+//     throw new CustomError(
+//       statusCodes.badRequest,
+//       Message.missingId,
+//       errorCodes.missing_id
+//     );
+//   }
+
+//   const allComplain = await Complaint.find({ tenantId, isDeleted: false }).sort({ createdAt: -1 });
+
+//   if (!allComplain) {
+//     throw new CustomError(
+//       statusCodes?.conflict,
+//       Message?.serverError,
+//       errorCodes?.conflict,
+//     );
+//   }
+//   return allComplain;
+// };
+
 export const allComplain = async (req) => {
+  const { id } = req.query;
+
+  if (!id) {
+    throw new CustomError(
+      statusCodes.badRequest,
+      Message.missingId,
+      errorCodes.missing_id
+    );
+  }
+
+  const allComplain = await Complaint.find({
+    $or: [{ tenantId: id }, { agentId: id }],
+    isDeleted: false
+  }).sort({ createdAt: -1 });
+
+  if (!allComplain) {
+    throw new CustomError(
+      statusCodes.conflict,
+      Message.serverError,
+      errorCodes.conflict
+    );
+  }
+
+  return allComplain;
+};
+
+export const allComplainForCompanyallComplain = async (req) => {
   const tenantId = req.query.id;
   if (!tenantId) {
     throw new CustomError(
@@ -142,6 +221,7 @@ export const fetchComplainById = async(req,res) =>{
    }
    const complain = await Complaint.find({_id:complainId})
    .populate("tenantId")
+   .populate("agentId")
    .populate("propertyId")
    .populate("companyId")
    .lean();
@@ -155,6 +235,72 @@ export const fetchComplainById = async(req,res) =>{
   return complain;
 }
 
+// export const allComplainForCompany = async (req, res) => {
+//   const companyId = req.query.id;
+//   if (!companyId) {
+//     throw new CustomError(
+//       statusCodes.badRequest,
+//       Message.missingId,
+//       errorCodes.missing_id
+//     );
+//   }
+
+//   const allComplain = await Complaint.find({ companyId, isDeleted: false })
+//     .populate("tenantId")
+//     .populate("propertyId", "propertyname")
+//     .sort({ createdAt: -1 })
+//     .lean();
+
+//   if (!allComplain) {
+//     throw new CustomError(
+//       statusCodes?.conflict,
+//       Message?.serverError,
+//       errorCodes?.conflict
+//     );
+//   }
+
+//   const finalResponse = [];
+
+//   for (let i = 0; i < allComplain.length; i++) {
+//     const complaint = allComplain[i];
+//     const tenant = complaint.tenantId;
+
+//     if (!tenant) {
+//       throw new CustomError(
+//         statusCodes?.badRequest,
+//         "ReporterId not found for tenant",
+//         errorCodes?.missing_reporter_id
+//       );
+//     }
+
+//     const createdBy = tenant.reporterId;
+//     let creator = await Agent.findById(createdBy);
+//     let name;
+
+//     if (creator) {
+//       name = creator.agentName; 
+//     } else {
+//       creator = await Company.findById(createdBy);
+//       if (creator) {
+//         name = creator.companyName; 
+//       }
+//     }
+
+//     if (!name) {
+//       throw new CustomError(
+//         statusCodes?.badRequest,
+//         "No valid creator found for reporterId",
+//         errorCodes?.invalid_reporter_id
+//       );
+//     }
+
+//     finalResponse.push({ ...complaint, reporterName: name });
+//   }
+
+//   return finalResponse;
+// };
+
+
 export const allComplainForCompany = async (req, res) => {
   const companyId = req.query.id;
   if (!companyId) {
@@ -165,11 +311,14 @@ export const allComplainForCompany = async (req, res) => {
     );
   }
 
-  const allComplain = await Complaint.find({ companyId, isDeleted: false })
+  const allComplain = await Complaint.find({ companyId, isDeleted: false ,tenantId: { $exists: true } })
     .populate("tenantId")
+    .populate("agentId")
     .populate("propertyId", "propertyname")
     .sort({ createdAt: -1 })
     .lean();
+
+    console.log(allComplain,"allComplain")
 
   if (!allComplain) {
     throw new CustomError(
@@ -179,44 +328,39 @@ export const allComplainForCompany = async (req, res) => {
     );
   }
 
-  const finalResponse = [];
 
-  for (let i = 0; i < allComplain.length; i++) {
-    const complaint = allComplain[i];
-    const tenant = complaint.tenantId;
+  return allComplain;
+};
 
-    if (!tenant || !tenant.reporterId) {
-      throw new CustomError(
-        statusCodes?.badRequest,
-        "ReporterId not found for tenant",
-        errorCodes?.missing_reporter_id
-      );
-    }
-
-    const createdBy = tenant.reporterId;
-    let creator = await Agent.findById(createdBy);
-    let name;
-
-    if (creator) {
-      name = creator.agentName; 
-    } else {
-      creator = await Company.findById(createdBy);
-      if (creator) {
-        name = creator.companyName; 
-      }
-    }
-
-    if (!name) {
-      throw new CustomError(
-        statusCodes?.badRequest,
-        "No valid creator found for reporterId",
-        errorCodes?.invalid_reporter_id
-      );
-    }
-
-    finalResponse.push({ ...complaint, reporterName: name });
+export const getAllComplainCompanyAgent = async (req, res) => {
+  const companyId = req.query.id;
+  if (!companyId) {
+    throw new CustomError(
+      statusCodes.badRequest,
+      Message.missingId,
+      errorCodes.missing_id
+    );
   }
 
-  return finalResponse;
+
+  const allComplain = await Complaint.find({ companyId, isDeleted: false, agentId: { $exists: true } }) 
+    .populate("tenantId")
+    .populate("agentId")
+    .populate("propertyId", "propertyname")
+    .sort({ createdAt: -1 })
+    .lean();
+
+    console.log(allComplain,"allComplain")
+
+  if (!allComplain) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.serverError,
+      errorCodes?.conflict
+    );
+  }
+
+
+  return allComplain;
 };
 
