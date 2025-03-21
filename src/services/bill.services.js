@@ -67,6 +67,7 @@ export const createbill = async (req, res) => {
   const {
     tenantId,
     propertyId,
+    bookingId,
     billingMonth,
     rentAmount,
     extraCharges = [],
@@ -102,6 +103,7 @@ export const createbill = async (req, res) => {
     propertyId,
     billingMonth,
     rentAmount,
+    bookingId,
     extraAmount,
     extraCharges,
     gstpercent,
@@ -195,6 +197,24 @@ export const getBillByT = async (req) => {
   return tenantBill;
 };
 
+export const getBillByBookingId = async (req) => {
+  const bookingId = req.query.id;
+  const bill = await Bill.find({bookingId:bookingId})
+    .populate("tenantId")
+    .populate("propertyId")
+    .populate("companyId");
+
+  if (!bill) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return bill;
+};
+
+
 export const getBillById = async (req) => {
   const billId = req.query.id;
   const bill = await Bill.findById(billId)
@@ -269,7 +289,6 @@ export const changeBillStatus = async (req) => {
 
 export const deleteBill = async (req, res) => {
   const billId = req.query.id;
-  console.log(billId, "billIdbillIdbillIdbillId");
 
   const bill = await Bill.findById(billId);
   if (!bill) {

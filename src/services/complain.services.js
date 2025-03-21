@@ -318,8 +318,6 @@ export const allComplainForCompany = async (req, res) => {
     .sort({ createdAt: -1 })
     .lean();
 
-    console.log(allComplain,"allComplain")
-
   if (!allComplain) {
     throw new CustomError(
       statusCodes?.conflict,
@@ -349,8 +347,6 @@ export const getAllComplainCompanyAgent = async (req, res) => {
     .populate("propertyId", "propertyname")
     .sort({ createdAt: -1 })
     .lean();
-
-    console.log(allComplain,"allComplain")
 
   if (!allComplain) {
     throw new CustomError(

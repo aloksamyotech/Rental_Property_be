@@ -39,7 +39,11 @@ const tenantSchema = new Schema(
       type: String,
       default:"tenant"
     },
-    isDeleted: {
+    status:{
+      type: Boolean,
+      default: true
+    },
+    isDeleted:{
       type: Boolean,
       default: false
     },

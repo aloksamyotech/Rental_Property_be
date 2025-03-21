@@ -20,6 +20,10 @@ const agentSchema = new Schema(
       type: String,
       default: "agent",
     },
+    status:{
+      type: Boolean,
+      default: true
+    },
     address: {
       type: String,
     },

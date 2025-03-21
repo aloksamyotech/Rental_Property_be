@@ -23,6 +23,11 @@ export const getAllCompany = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
+export const changestatus = async (req, res) => {
+  const companyData = await companyServices.changestatus(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
 export const getCompanyById = async (req, res) => {
   const getCurrency = await companyServices.getCompanyById(req, res);
   res.status(statusCodes?.created).send(getCurrency);
