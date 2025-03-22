@@ -35,20 +35,6 @@ export const createTenant = async (req) => {
     );
   }
 
-  // const existingTenant = await Tenant.findOne({ email });
-
-  // if (existingTenant) {
-  //   throw new CustomError(
-  //     statusCodes?.conflict,
-  //     Message?.alreadyExist,
-  //     errorCodes?.already_exist
-  //   );
-  // }
-
-  // let filePaths = [];
-  // if (req.files && req.files.length > 0) {
-  //   filePaths = req.files.map((file) => `uploads/tenant/${file.filename}`);
-  // }
 
 
   const uploadedFiles = req.files.map((file) => ({
@@ -212,7 +198,7 @@ export const editTenant = async (req, res) => {
   if (!tenantId) {
     throw new CustomError(
       statusCodes?.badRequest,
-      "Tenant ID is required.",
+      Message?.inValid,
       errorCodes?.missing_parameter
     );
   }
@@ -225,7 +211,7 @@ export const editTenant = async (req, res) => {
   if (!updatedTenant) {
     throw new CustomError(
       statusCodes?.notFound,
-      "Tenant not found.",
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -239,7 +225,7 @@ export const deleteTenantById = async (req, res) => {
   if (!tenant) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -256,7 +242,7 @@ export const getTenantsById = async (req, res, next) => {
   if (!id) {
     throw new CustomError(
       statusCodes?.badRequest,
-      "Tenant ID is required",
+      Message?.notFound,
       errorCodes?.invalid_request
     );
   }
@@ -297,7 +283,7 @@ export const getAllTenants = async (req, res, next) => {
   if (!tenants) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "No tenants found",
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -333,7 +319,7 @@ export const getAllDocs = async (req, res, next) => {
   if (!tenantsDocs) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "No Document found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -355,7 +341,7 @@ export const uploadDocuments = async (req, res, next) => {
   if (!document) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "No Document found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -371,7 +357,7 @@ export const getMyTenants = async (req, res) => {
   if (!tenant) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -403,7 +389,7 @@ export const deleteTenantDocs = async (req, res) => {
   if (!tenantDocs) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Image not found",
+      Message?.notFound,
       errorCodes?.not_found
     );
   }

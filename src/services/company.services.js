@@ -265,7 +265,7 @@ export const deleteCompany = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Company not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -284,7 +284,7 @@ export const changestatus = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Company not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

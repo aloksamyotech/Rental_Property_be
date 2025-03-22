@@ -294,7 +294,7 @@ export const deleteBill = async (req, res) => {
   if (!bill) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Bill not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

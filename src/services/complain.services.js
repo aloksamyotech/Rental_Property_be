@@ -162,7 +162,7 @@ export const deleteComplain = async (req, res) => {
   if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -179,7 +179,7 @@ export const resolveComplain = async (req, res) => {
   if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -199,7 +199,7 @@ export const addCommentToComplain = async (req, res) => {
   if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Complain not found",
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -228,7 +228,7 @@ export const fetchComplainById = async(req,res) =>{
    if (!complain) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Complain not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

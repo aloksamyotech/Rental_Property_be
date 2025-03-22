@@ -161,7 +161,7 @@ export const deleteAgent = async (req, res) => {
   if (!agent) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -179,7 +179,7 @@ export const getAgentById = async (req, res) => {
   if (!agent) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Agent not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

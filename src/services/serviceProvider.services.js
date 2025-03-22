@@ -68,47 +68,6 @@ export const editServiceProvider = async (req, res) => {
   
 };
 
-// export const getProperty = async(req, res, next) => {
-//   const companyId = req.query.id;
-//   const Properties = await Property.find({ companyId, isDeleted: false , isVacant: true}).sort({ createdAt: -1 });
-//   if (!Properties  ) {
-//     return new CustomError(
-//       statusCodes?.serviceUnavailable,
-//       Message?.serverError,
-//       errorCodes?.service_unavailable,
-//     );
-//   }
-//     return Properties;
-// };
-
-
-// export const getAllProperties = async(req, res, next) => {
-//   const companyId = req.query.id;
-//   const Properties = await Property.find({ companyId, isDeleted: false }).sort({ createdAt: -1 });
-//   if (!Properties  ) {
-//     return new CustomError(
-//       statusCodes?.serviceUnavailable,
-//       Message?.serverError,
-//       errorCodes?.service_unavailable,
-//     );
-//   }
-//     return Properties;
-// };
-
-
-// export const getVacantProperty = async(req, res, next) => {
-//   const companyId = req.query.id;
-//   const Properties = await Property.find({ companyId, isDeleted: false,isVacant: true }).sort({ createdAt: -1 });
-//   if (!Properties ) {
-//     return new CustomError(
-//       statusCodes?.serviceUnavailable,
-//       Message?.serverError,
-//       errorCodes?.service_unavailable,
-//     );
-//   }
-//   console.log("PropertiesPropertiesPropertiesProperties",Properties);
-//     return Properties;
-// };
 
 
 export const deleteServiceProvider = async (req, res) => {
@@ -118,7 +77,7 @@ export const deleteServiceProvider = async (req, res) => {
   if (!serviceProviderData) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   } 
@@ -140,7 +99,7 @@ export const getServiceProviders = async (req, res) => {
   if (!serviceProvider) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Service Provider not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

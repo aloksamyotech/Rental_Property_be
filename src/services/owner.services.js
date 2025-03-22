@@ -48,7 +48,7 @@ export const getOwnerById = async (req, res) => {
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Owner not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   } 
@@ -183,7 +183,7 @@ export const deleteOwner = async (req, res) => {
   if (!owner) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }

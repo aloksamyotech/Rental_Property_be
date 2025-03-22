@@ -131,7 +131,7 @@ export const uploadImages = async (req, res, next) => {
   if (!document) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "No Document found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -150,7 +150,7 @@ export const getAllImages = async (req, res, next) => {
   if (!propertyImg) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "No Property Images found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -214,7 +214,7 @@ export const deleteProperty = async (req, res) => {
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -233,7 +233,7 @@ export const deletePropertyImg = async (req, res) => {
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Image not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
