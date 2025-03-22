@@ -8,7 +8,7 @@ export const registerOwner = async (req, res) => {
 
   const { ownerName, email, password, phoneNo, address, companyId } = req.body;
 
-  const isOwnerAlreadyExist = await Owner.findOne({ email });
+  const isOwnerAlreadyExist = await Owner.findOne({ email, isDeleted: false } );
 
   if (isOwnerAlreadyExist) {
     throw new CustomError(
