@@ -1,141 +1,137 @@
-
-import  Property  from "../models/property.model.js";
+import Property from "../models/property.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import Owner from "../models/owner.model.js";
 import Booking from "../models/booking,model.js";
 import Company from "../models/company.model.js";
 import PropertyImg from "../models/propertyImages.model.js";
 
-
 export const createProperty = async (req, res) => {
-    const {
-      propertyname,
-      typeId,
-      description,
-      address,
-      zipcode,
-      maplink,
-      rent,
-      area,
-      ownerId,
-      companyId,
-    } = req.body;
+  const {
+    propertyname,
+    typeId,
+    description,
+    address,
+    zipcode,
+    maplink,
+    rent,
+    area,
+    ownerId,
+    companyId,
+  } = req.body;
 
-    const isPropertyAlreadyExist = await Property.findOne({ propertyname });
-    if (isPropertyAlreadyExist) {
-      return new CustomError(
-        statusCodes?.notFound,
-        Message?.notFound,
-        errorCodes?.not_found,
-      );
-    }
+  const isPropertyAlreadyExist = await Property.findOne({ propertyname });
+  if (isPropertyAlreadyExist) {
+    return new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.not_found
+    );
+  }
 
-    let filePaths = [];
-    if (req.files && req.files.length > 0) {
-      filePaths = req.files.map(file => `uploads/${file.filename}`);
-    }
+  let filePaths = [];
+  if (req.files && req.files.length > 0) {
+    filePaths = req.files.map((file) => `uploads/${file.filename}`);
+  }
 
-    const property = await Property.create({
-      propertyname,
-      typeId,
-      description,
-      address,
-      zipcode,
-      maplink,
-      rent,
-      area,
-      ownerId,
-      companyId,
-      files: filePaths, 
-    });
+  const property = await Property.create({
+    propertyname,
+    typeId,
+    description,
+    address,
+    zipcode,
+    maplink,
+    rent,
+    area,
+    ownerId,
+    companyId,
+    files: filePaths,
+  });
 
-    return property
+  return property;
 };
 
-
 export const editProperty = async (req, res) => {
-      const propertyId = req.query.id;
+  const propertyId = req.query.id;
 
-    if (!propertyId) {
+  if (!propertyId) {
+    return res.status(400).json({
+      message: "Property ID is required.",
+      errorCode: "property_id_missing",
+    });
+  }
+
+  const {
+    propertyname,
+    typeId,
+    description,
+    address,
+    zipcode,
+    maplink,
+    rent,
+    area,
+    ownerId,
+    companyId,
+  } = req.body;
+
+  let filePath = null;
+  if (req.files && req.files.length > 0) {
+    const file = req.files[0];
+    if (file?.filename) {
+      filePath = `uploads/property/${file.filename}`;
+    } else {
       return res.status(400).json({
-        message: "Property ID is required.",
-        errorCode: "property_id_missing",
+        message: "File upload failed",
+        errorCode: "file_upload_error",
       });
     }
+  }
 
-    const {
-      propertyname,
-      typeId,
-      description,
-      address,
-      zipcode,
-      maplink,
-      rent,
-      area,
-      ownerId,
-      companyId,
-    } = req.body;
+  const updateData = {
+    propertyname,
+    typeId,
+    description,
+    address,
+    zipcode,
+    maplink,
+    rent,
+    area,
+    ownerId,
+    companyId,
+    ...(filePath && { files: filePath }),
+  };
+  const updatedProperty = await Property.findByIdAndUpdate(
+    propertyId,
+    updateData,
+    { new: true, runValidators: true }
+  );
 
-    let filePath = null;
-    if (req.files && req.files.length > 0) {
-      const file = req.files[0];
-      if (file?.filename) {
-        filePath = `uploads/property/${file.filename}`;
-      } else {
-        return res.status(400).json({
-          message: "File upload failed",
-          errorCode: "file_upload_error",
-        });
-      }
-    }
+  if (!updatedProperty) {
+    return res.status(404).json({
+      message: "Property not found.",
+      errorCode: "property_not_found",
+    });
+  }
 
-    const updateData = {
-      propertyname,
-      typeId,
-      description,
-      address,
-      zipcode,
-      maplink,
-      rent,
-      area,
-      ownerId,
-      companyId,
-      ...(filePath && { files: filePath }),
-    };
-    const updatedProperty = await Property.findByIdAndUpdate(
-      propertyId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedProperty) {
-      return res.status(404).json({
-        message: "Property not found.",
-        errorCode: "property_not_found",
-      });
-    }
-
-    return updatedProperty;
-  
+  return updatedProperty;
 };
 
 export const uploadImages = async (req, res, next) => {
   // const tenantId = req.query.id;
 
-  const {name,propertyId} = req.body;
+  const { name, propertyId } = req.body;
 
   const document = await PropertyImg.create({
     propertyId,
-    documentName:name,
-    url:  `uploads/${req.file.filename}`, 
+    documentName: name,
+    url: `uploads/${req.file.filename}`,
   });
 
-  if (!document ) {
+  if (!document) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || 'No Document found',
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -151,10 +147,10 @@ export const getAllImages = async (req, res, next) => {
     // isDeleted: false,
   }).sort({ createdAt: -1 });
 
-  if (!propertyImg ) {
+  if (!propertyImg) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || 'No Property Images found',
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -162,48 +158,53 @@ export const getAllImages = async (req, res, next) => {
   return propertyImg;
 };
 
-
-export const getProperty = async(req, res, next) => {
+export const getProperty = async (req, res, next) => {
   const companyId = req.query.id;
-  const Properties = await Property.find({ companyId, isDeleted: false , isVacant: true}).sort({ createdAt: -1 });
-  if (!Properties  ) {
+  const Properties = await Property.find({
+    companyId,
+    isDeleted: false,
+    isVacant: true,
+  }).sort({ createdAt: -1 });
+  if (!Properties) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
-      errorCodes?.service_unavailable,
+      errorCodes?.service_unavailable
     );
   }
-    return Properties;
+  return Properties;
 };
 
-
-export const getAllProperties = async(req, res, next) => {
+export const getAllProperties = async (req, res, next) => {
   const companyId = req.query.id;
   const Properties = await Property.find({ companyId, isDeleted: false })
-  .populate("typeId")
-  .sort({ createdAt: -1 });
-  if (!Properties  ) {
+    .populate("typeId")
+    .sort({ createdAt: -1 });
+  if (!Properties) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
-      errorCodes?.service_unavailable,
+      errorCodes?.service_unavailable
     );
   }
-    return Properties;
+  return Properties;
 };
 
-
-export const getVacantProperty = async(req, res, next) => {
+export const getVacantProperty = async (req, res, next) => {
   const companyId = req.query.id;
-  const Properties = await Property.find({ companyId, isDeleted: false,isVacant: true }).sort({ createdAt: -1 });
-  if (!Properties ) {
+  const Properties = await Property.find({
+    companyId,
+    isDeleted: false,
+    isVacant: true,
+  }).sort({ createdAt: -1 });
+  if (!Properties) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
-      errorCodes?.service_unavailable,
+      errorCodes?.service_unavailable
     );
   }
-    return Properties;
+  return Properties;
 };
 
 export const deleteProperty = async (req, res) => {
@@ -213,27 +214,26 @@ export const deleteProperty = async (req, res) => {
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Tenant not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
-  } 
+  }
 
   property.isDeleted = true;
   await property.save();
 
-  return property
+  return property;
 };
-
 
 export const deletePropertyImg = async (req, res) => {
   const propertyId = req.query.id;
 
   const property = await PropertyImg.findByIdAndDelete(propertyId);
-    
+
   if (!property) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Image not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -251,10 +251,10 @@ export const getPropertyById = async (req, res) => {
   // .lean();
 
   const property = await Property.findById(propertyId)
-  .populate("typeId")
-  .populate("ownerId")
-  .sort({ createdAt: -1 })
-  .lean();
+    .populate("typeId")
+    .populate("ownerId")
+    .sort({ createdAt: -1 })
+    .lean();
 
   if (!property) {
     throw new CustomError(
@@ -263,25 +263,22 @@ export const getPropertyById = async (req, res) => {
       errorCodes?.not_found
     );
   }
-  return property
+  return property;
 };
 
-
 export const uploadProperty = (req, res) => {
-  const {id} = req.query;
+  const { id } = req.query;
   const company = Company.findById(id);
-  if(!company){
+  if (!company) {
     return new CustomError(
       statusCodes?.serviceUnavailable,
       Message?.serverError,
-      errorCodes?.service_unavailable,
+      errorCodes?.service_unavailable
     );
   }
   const Files = req.files;
   if (!req.files === 0) {
-    return res.status(400).send('No files uploaded.');
+    return res.status(400).send("No files uploaded.");
   }
   return Files;
 };
-
-

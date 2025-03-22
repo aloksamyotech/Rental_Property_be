@@ -8,7 +8,6 @@ import Company from "../models/company.model.js";
 import Tenant from "../models/tenant.model.js";
 import Bill from "../models/billing.model.js";
 
-
 export const createBooking = async (req, res) => {
   const {
     tenantId,
@@ -29,7 +28,7 @@ export const createBooking = async (req, res) => {
     rentAmount,
     advanceAmount,
     companyId,
-    createdBy
+    createdBy,
   });
   const property = await Property.findById(propertyId);
   property.isVacant = false;
@@ -38,7 +37,6 @@ export const createBooking = async (req, res) => {
   const tenant = await Tenant.findById(tenantId);
   tenant.isOccupied = true;
   await tenant.save();
-
 
   return newBooking;
 };
@@ -81,11 +79,11 @@ export const editBooking = async (req, res, next) => {
 export const getBooking = async (req) => {
   const { id } = req.query;
 
-  const AllBooking = await Booking.find({ createdBy: id , isDeleted: false})
-  .populate("tenantId", "tenantName")
-  .populate("propertyId", "propertyname")
-  .sort({ createdAt: -1 })
-  .lean();
+  const AllBooking = await Booking.find({ createdBy: id, isDeleted: false })
+    .populate("tenantId", "tenantName")
+    .populate("propertyId", "propertyname")
+    .sort({ createdAt: -1 })
+    .lean();
 
   if (!AllBooking) {
     throw new CustomError(
@@ -114,25 +112,24 @@ export const getBooking = async (req) => {
   return finalResponse;
 };
 
-export const getBookingById = async(req) =>{
-  const {id} = req.query;
+export const getBookingById = async (req) => {
+  const { id } = req.query;
   const booking = await Booking.findById(id)
-  .populate("tenantId")
-  .populate("propertyId")
-  .populate("companyId")
-  .sort({ createdAt: -1 })
-  .lean();
- 
-  if (!booking ) {
+    .populate("tenantId")
+    .populate("propertyId")
+    .populate("companyId")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  if (!booking) {
     throw new CustomError(
       statusCodes?.notFound,
       Message?.notFound,
       errorCodes?.no_data_found
     );
   }
-  return booking
-}
-
+  return booking;
+};
 
 export const breakTheBooking = async (req) => {
   const { id } = req.query;
@@ -175,13 +172,10 @@ export const breakTheBooking = async (req) => {
   return booking;
 };
 
-
-
-
 export const getAllBooking = async (req) => {
   const { id } = req.query;
 
-  const allBooking = await Booking.find({ companyId: id , isDeleted: false})
+  const allBooking = await Booking.find({ companyId: id, isDeleted: false })
     .populate("tenantId")
     .populate("propertyId")
     .sort({ createdAt: -1 })
@@ -214,26 +208,24 @@ export const getAllBooking = async (req) => {
   return finalResponse;
 };
 
-
 export const vacantPropertyOnNotice = async (req, res) => {
   const { id } = req.query;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    const after15Days = new Date();
-    after15Days.setDate(today.getDate() + 15);
-    after15Days.setHours(23, 59, 59, 999); 
+  const after15Days = new Date();
+  after15Days.setDate(today.getDate() + 15);
+  after15Days.setHours(23, 59, 59, 999);
 
-    const bookings = await Booking.find({
-      endingDate: {
-        $gte: today, 
-        $lte: after15Days,
-      },
-      companyId: id ,
-      isDeleted: false, 
-    }).populate("propertyId tenantId companyId"); 
-  
-    return bookings;
- 
+  const bookings = await Booking.find({
+    endingDate: {
+      $gte: today,
+      $lte: after15Days,
+    },
+    companyId: id,
+    isDeleted: false,
+  }).populate("propertyId tenantId companyId");
+
+  return bookings;
 };

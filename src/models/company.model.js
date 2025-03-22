@@ -20,6 +20,10 @@ const companySchema = new Schema(
       type: String,
       default:"companyAdmin"
     },
+    status:{
+      type: Boolean,
+      default: true
+    },
     address: {
       type: String
     },

@@ -110,9 +110,9 @@ export const universalLogin = async (req, res) => {
 
   let user = null;
 
-  const company = await Company.findOne({ email, isDeleted: false });
-  const agent = await Agent.findOne({ email, isDeleted: false });
-  const tenant = await Tenant.findOne({ email, isDeleted: false });
+  const company = await Company.findOne({ email, isDeleted: false , status : true});
+   const agent = await Agent.findOne({ email, isDeleted: false , status : true});
+  const tenant = await Tenant.findOne({ email, isDeleted: false , status : true});
   
   if (company) {
     user = company;
@@ -265,7 +265,7 @@ export const deleteCompany = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound || "Company not found",
+      Message?.notFound ,
       errorCodes?.not_found
     );
   }
@@ -275,6 +275,39 @@ export const deleteCompany = async (req, res) => {
 
   return company;
 };
+
+export const changestatus = async (req, res) => {
+  const companyId = req.query.id;
+
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound ,
+      errorCodes?.not_found
+    );
+  }
+
+  const newCompanyStatus = !company.status;
+  company.status = newCompanyStatus;
+  await company.save();
+
+  await Agent.updateMany(
+    { companyId },
+    { $set: { status: newCompanyStatus } }
+  );
+
+  await Tenant.updateMany(
+    { companyId },
+    { $set: { status: newCompanyStatus } }
+  );
+
+    return company;
+
+};
+
+
 
 // export const commentAndResolved = async (req, res) => {
 //   const companyId = req.query.id;

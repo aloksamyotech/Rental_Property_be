@@ -59,6 +59,10 @@ const billSchema = new Schema({
   note:{
     type: String
   },
+  bookingId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Booking'
+  },
   companyId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Company'

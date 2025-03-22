@@ -4,7 +4,7 @@ const router = Router();
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 //LandLord Routes........................................................
 // import { userLogin,userRegistration } from "../controllers/user.controller.js";
-import {companyRegistration, universalLogin, getAllCompany,editCompany, deleteCompany,commentAndResolved,getCompanyById} from "../controllers/company.controller.js"
+import {companyRegistration, universalLogin, getAllCompany,editCompany, deleteCompany,commentAndResolved,getCompanyById,changestatus} from "../controllers/company.controller.js"
 
 router.post("/register", asyncHandler(companyRegistration));
 router.get("/getAllCompanies", asyncHandler(getAllCompany))
@@ -14,5 +14,9 @@ router.patch("/delete", asyncHandler(deleteCompany));
 
 router.get("/getComplaints", asyncHandler(commentAndResolved));
 router.get("/getCompanyById", asyncHandler(getCompanyById));
+
+router.patch("/changestatus", asyncHandler(changestatus));
+
+
 
 export default router;
