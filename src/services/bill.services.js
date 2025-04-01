@@ -9,6 +9,7 @@ import {
 } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import crypto from "crypto";
+import {sendEmail} from "../core/helpers/mail.js"
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 // export const createbill = async (req, res) => {
@@ -137,8 +138,76 @@ export const createbill = async (req, res) => {
     );
   }
 
+     const CompanyDetails = await Company.findById(companyId);
+    
+      if(CompanyDetails.isMailStatus){
+        sendTenantBillEmail(newBill,property,CompanyDetails,tenant);
+      }
+  
+
   return newBill;
 };
+
+const sendTenantBillEmail = async (newBill, property, CompanyDetails, tenant) => {
+  try {
+    // Generate extra charges list dynamically if there are extra charges
+    const extraChargesList = newBill.extraCharges && newBill.extraCharges.length > 0
+      ? newBill.extraCharges.map(charge => {
+          return `<li><strong>${charge.serviceName}:</strong> $${charge.price}</li>`;
+        }).join('') // Join the array elements into a string
+      : `<li><strong>Extra Charges:</strong> None</li>`; // If no extra charges, show "None"
+
+    // Email to Tenant with Billing Details
+    const billDetails = `
+    <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333;">
+      
+      <!-- Header Section -->
+      <div style="background-color: #4CAF50; color: white; padding: 15px; text-align: center;">
+        <h2 style="margin: 0;">Your Bill from ${CompanyDetails.companyName}</h2>
+      </div>
+
+      <!-- Body Section -->
+      <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
+        <p style="font-size: 16px; line-height: 1.6;">Dear ${tenant?.tenantName},</p>
+        <p style="font-size: 16px; line-height: 1.6;">Thank you for being a valued tenant at <strong>${CompanyDetails.companyName}</strong>. Below are the details of your latest bill for the property you are renting:</p>
+        
+        <ul style="font-size: 16px; line-height: 1.6;">
+          <li><strong>Invoice No:</strong> ${newBill.invoiceNo}</li>
+          <li><strong>Billing Month:</strong> ${new Date(newBill.billingMonth).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</li>
+          <li><strong>Property:</strong> ${property.propertyname}</li>
+          <li><strong>Rent Amount:</strong> $${newBill.rentAmount}</li>
+          ${extraChargesList} <!-- Dynamically add extra charges -->
+          <li><strong>GST (${newBill.gstpercent}%):</strong> $${newBill.totalgst}</li>
+          <li><strong>Total Bill Amount After GST:</strong> $${newBill.totalBillAmountAfterGST}</li>
+          <li><strong>Note:</strong> ${newBill.note || "No additional notes"}</li>
+          <li><strong>Payment Status:</strong> ${newBill.status || "No additional notes"}</li>
+        </ul>
+
+        <p style="font-size: 16px; line-height: 1.6;">Please ensure to make the payment before the due date. If you have any questions or concerns regarding your bill, feel free to contact us.</p>
+      </div>
+
+      <!-- Footer Section -->
+      <div style="background-color: #f4f4f4; color: #777; text-align: center; padding: 15px;">
+        <p style="margin: 0;">Best regards,</p>
+        <p style="margin: 0;"><strong>The ${CompanyDetails.companyName} Team</strong></p>
+        <p>${CompanyDetails.email}</p>
+      </div>
+    </div>
+    `;
+
+    // Send the email to the tenant
+    return sendEmail(
+      tenant?.email,
+      "Your Bill from " + CompanyDetails.companyName,
+      billDetails,
+      CompanyDetails._id
+    );
+  } catch (err) {
+    console.error("Failed to send tenant bill email:", err);
+  }
+};
+
+
 
 export const getAllBill = async (req) => {
   const companyId = req.query.id;

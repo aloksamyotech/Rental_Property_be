@@ -1,39 +1,37 @@
-const nodemailer = require("nodemailer");
-const getJWTPayload = require("../core/helper");
-const { findSmtpDetails } = require("../controllers/hotel/hotel");
+import nodemailer from 'nodemailer';
+// import getJWTPayload from './payload';
+import { findSmtpDetails } from '../../services/company.services.js';
 
 // Function to send an email
-const sendEmail = async (to, subject, text, token) => {
-  const payload = await getJWTPayload(token);
-  const HotelId = payload?.HotelId;
-  const smtpDetails = await findSmtpDetails(HotelId);
-  try {
+const sendEmail = async (to, subject, text, CompanyId) => {
+  // const payload = await getJWTPayload(token);
+  // const CompanyId = payload?.companyId;
+  const smtpDetails = await findSmtpDetails(CompanyId);
 
+  try {
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host: 'smtp.gmail.com',
       port: 587,
       auth: {
         user: smtpDetails.mail,
         pass: smtpDetails.key,
       },
     });
-    // user: "jairajlakher018@gmail.com",
-    // pass: "cmzdorvvyarzphux",
 
     const mailOptions = {
-      from: "jairajlakher018@gmail.com",
-      to: to,
-      subject: subject,
-      html: text,   
+      from: 'jairajlakher018@gmail.com',  // Sender's email
+      to: to,                           // Recipient's email
+      subject: subject,                 // Subject of the email
+      html: text,                       // HTML content of the email
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: " + info.response);
+    console.log('Email sent: ' + info.response);
     return info.response;
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error('Failed to send email:', error);
     throw error;
   }
 };
 
-module.exports = { sendEmail };
+export { sendEmail };

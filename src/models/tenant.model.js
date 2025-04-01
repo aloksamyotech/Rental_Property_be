@@ -57,7 +57,8 @@ const tenantSchema = new Schema(
     },  
     reporterId:{
       type: mongoose.Schema.Types.ObjectId
-    }
+    },
+  
   },
   { timestamps: true },
 );

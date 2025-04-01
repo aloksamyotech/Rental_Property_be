@@ -3,6 +3,9 @@ import mongoose, { Schema } from "mongoose";
 
 const bookingSchema = new Schema(
   {
+    bookingNo: {
+      type: String
+    },
     propertyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Property"

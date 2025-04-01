@@ -37,6 +37,16 @@ const companySchema = new Schema(
       type: Boolean,
       default: false
     },
+    smtpMail: {
+      type: String,
+    },
+    smtpCode: {
+      type: String,
+    },
+    isMailStatus:{
+      type: Boolean,
+      default: false
+    },
     refreshToken: {
       type: String
     },

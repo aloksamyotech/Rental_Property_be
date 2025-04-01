@@ -10,28 +10,19 @@ export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
   // const isCompanyAlreadyExist = await Company.findOne({ email });
 
-  const [isCompanyAlreadyExist, isAgentAlreadyExist, isStudentAlreadyExist] = await Promise.all([
+  const [isCompanyAlreadyExist, isAgentAlreadyExist, isTenantAlreadyExist] = await Promise.all([
     Company.findOne({ email , isDeleted: false }),
-     Agent.findOne({ email  , isDeleted: false }),
-     Tenant.findOne({ email ,isDeleted: false})
+    Agent.findOne({ email  , isDeleted: false }),
+    Tenant.findOne({ email , isDeleted: false})
   ]);
   
-  if (isCompanyAlreadyExist || isAgentAlreadyExist || isStudentAlreadyExist) {
+  if (isCompanyAlreadyExist || isAgentAlreadyExist || isTenantAlreadyExist) {
     throw new CustomError(
       statusCodes?.conflict,
       Message?.alreadyExist,
       errorCodes?.already_exist
     )
   }
-  
-
-  // if (isCompanyAlreadyExist) {
-  //   throw new CustomError(
-  //     statusCodes?.conflict,
-  //     Message?.alreadyExist,
-  //     errorCodes?.already_exist
-  //   );
-  // }
 
   const company = await Company.create({
     companyName,
@@ -56,6 +47,44 @@ export const companyRegistration = async (req) => {
   }
   return createdCompany;
 
+};
+
+
+export const addSMTPMailPassword = async (req) => {
+
+      const { id, smtpMail, smtpCode } = req.body;
+
+      if (!id) {
+        throw new CustomError(statusCodes.badRequest, "Invalid Company ID", errorCodes.invalid_request);
+      }
+  
+      const companyMailSMTP = await Company.findByIdAndUpdate(
+        id, 
+        { smtpMail, smtpCode },
+        { new: true, runValidators: true }
+      );
+  
+      if (!companyMailSMTP) {
+        throw new CustomError(statusCodes.notFound, Message.notFound, errorCodes.not_found);
+      }
+
+      return companyMailSMTP;
+  
+};
+
+export const findSmtpDetails = async (CompanyId) => {
+
+    const companyDetails = await Company.findOne({ _id: CompanyId});
+    if (!companyDetails) {
+      return false;
+    }
+
+    const smtp = {
+      key: companyDetails?.smtpCode,
+      mail: companyDetails?.smtpMail,
+    };
+
+    return smtp;
 };
 
 // export const companyLogin = async (req, res) => {
@@ -304,6 +333,27 @@ export const changestatus = async (req, res) => {
   );
 
     return company;
+
+};
+
+export const updateMailStatus = async (req, res) => {
+  const companyId = req.body.id;
+
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound ,
+      errorCodes?.not_found
+    );
+  }
+
+  const newStatus = !company.isMailStatus;
+  company.isMailStatus = newStatus;
+  await company.save();
+
+  return company;
 
 };
 

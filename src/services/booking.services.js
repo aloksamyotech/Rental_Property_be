@@ -1,11 +1,17 @@
 // import Agent from "../models/agents.model.js";
 import Booking from "../models/booking,model.js";
 import Property from "../models/property.model.js";
-import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
+import {
+  errorCodes,
+  bookingPrefix,
+  Message,
+  statusCodes,
+} from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 import Tenant from "../models/tenant.model.js";
+import {sendEmail} from "../core/helpers/mail.js"
 import Bill from "../models/billing.model.js";
 
 export const createBooking = async (req, res) => {
@@ -20,7 +26,18 @@ export const createBooking = async (req, res) => {
     createdBy,
   } = req.body;
 
+  
+    const generateBookingNumber = () => {
+      const prefix = bookingPrefix.prefix;
+      const year = new Date().getFullYear().toString().slice(-2);
+      const randomNumbers = Math.floor(100 + Math.random() * 900);
+      return `${prefix}${year}${randomNumbers}`;
+    };
+  
+    const bookingNo = generateBookingNumber();
+
   const newBooking = await Booking.create({
+    bookingNo:bookingNo,
     tenantId,
     propertyId,
     startingDate,
@@ -38,8 +55,68 @@ export const createBooking = async (req, res) => {
   tenant.isOccupied = true;
   await tenant.save();
 
+  
+  const CompanyDetails = await Company.findById(companyId);
+
+  if(CompanyDetails.isMailStatus){
+    sendBookingConfirmationEmail(tenant,property,CompanyDetails,newBooking);
+  }
+
   return newBooking;
 };
+
+
+
+
+const sendBookingConfirmationEmail = async (tenant,property, CompanyDetails, newBooking) => {
+  try {
+    const bookingDetails = `
+    <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333;">
+      
+      <!-- Header Section -->
+      <div style="background-color: #4CAF50; color: white; padding: 15px; text-align: center;">
+        <h2 style="margin: 0;">Your Booking Confirmation - ${CompanyDetails.companyName}</h2>
+      </div>
+
+      <!-- Body Section -->
+      <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
+        <p style="font-size: 16px; line-height: 1.6;">Dear ${tenant?.tenantName},</p>
+        <p style="font-size: 16px; line-height: 1.6;">Thank you for booking with <strong>${CompanyDetails.companyName}</strong>. Your booking has been successfully confirmed. Below are the details of your booking:</p>
+        
+        <ul style="font-size: 16px; line-height: 1.6;">
+          <li><strong>Booking ID:</strong> ${newBooking.bookingNo}</li>
+          <li><strong>Property Name:</strong> ${property.propertyname}</li>
+   <li><strong>Check-in Date:</strong> ${new Date(newBooking.startingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</li>
+<li><strong>Check-out Date:</strong> ${new Date(newBooking.endingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</li>
+
+          <li><strong>Rent Amount:</strong> $${newBooking.rentAmount}</li>
+          <li><strong>Advance Amount:</strong> $${newBooking.advanceAmount}</li>
+        </ul>
+        
+        <p style="font-size: 16px; line-height: 1.6;">We are looking forward to hosting you at <strong>${property.propertyname}</strong>. If you have any questions or need further assistance, feel free to contact us.</p>
+      </div>
+
+      <!-- Footer Section -->
+      <div style="background-color: #f4f4f4; color: #777; text-align: center; padding: 15px;">
+        <p style="margin: 0;">Best regards,</p>
+        <p style="margin: 0;"><strong>The ${CompanyDetails.companyName} Team</strong></p>
+        <p>${CompanyDetails.email}</p>
+      </div>
+    </div>
+    `;
+
+    return sendEmail(
+      tenant?.email,
+      "Your Booking Confirmation - Tenant Booking Details",
+      bookingDetails,
+      CompanyDetails._id
+    );
+  } catch (err) {
+    console.error("Failed to send booking confirmation email:", err);
+  }
+};
+
+
 
 const generateBookingId = () => {
   const randomPart = Math.floor(1000 + Math.random() * 9000);
