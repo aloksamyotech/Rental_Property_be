@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncWrapper.js";
 const router = Router();
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
-import { createbill,getAllBill,getBillForT,getBillById,reporterDetails,changeBillStatus,deleteBill,getBillByCreaterBy,getBillByBookingId} from "../controllers/bill.controller.js";
+import { createbill,getAllBill,getBillForT,getBillById,reporterDetails,changeBillStatus,deleteBill,getAllUnpaidBillForAgent,getBillByCreaterBy,totalPaidBills,getBillByBookingId,getMonthlyBillData,getTotalSales,totalYearlySales,totalPendingBills} from "../controllers/bill.controller.js";
 
 
 
@@ -16,7 +16,12 @@ router.get("/getBillById", asyncHandler(getBillById));
 router.patch("/DeleteBill", asyncHandler(deleteBill));
 router.get("/getBillByAgentId", asyncHandler(getBillByCreaterBy));
 router.get("/getBillByBookingId", asyncHandler(getBillByBookingId));
-
+router.get("/getMonthlyBillData", asyncHandler(getMonthlyBillData));
+router.get("/getTotalSales", asyncHandler(getTotalSales));
+router.get("/totalYearlySales", asyncHandler(totalYearlySales));
+router.get("/totalPendingBills", asyncHandler(totalPendingBills));
+router.get("/totalPaidBills", asyncHandler(totalPaidBills));
+router.get("/getAllUnpaidBillForAgent", asyncHandler(getAllUnpaidBillForAgent));
 
 export default router;
 

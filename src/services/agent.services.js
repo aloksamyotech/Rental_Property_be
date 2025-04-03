@@ -70,7 +70,7 @@ const sendAgentRegistrationEmail = async (agent, CompanyDetails) => {
       <!-- Body Section -->
       <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
         <p style="font-size: 16px; line-height: 1.6;">Dear ${agent.agentName},</p>
-        <p style="font-size: 16px; line-height: 1.6;">Thank you for joining ${CompanyDetails.companyName} as an agent. We are excited to have you on board. Below are your registration details:</p>
+        <p style="font-size: 16px; line-height: 1.6;">Thank you for joining ${CompanyDetails.companyName} as an agent. We are excited to have you on board as our Agent . Below are your registration details:</p>
         
         <ul style="font-size: 16px; line-height: 1.6;">
           <li><strong>Agent Name:</strong> ${agent.agentName}</li>

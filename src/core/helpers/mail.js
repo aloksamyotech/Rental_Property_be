@@ -7,7 +7,7 @@ const sendEmail = async (to, subject, text, CompanyId) => {
   // const payload = await getJWTPayload(token);
   // const CompanyId = payload?.companyId;
   const smtpDetails = await findSmtpDetails(CompanyId);
-
+console.log(smtpDetails,"smtpDetails")
   try {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -19,10 +19,10 @@ const sendEmail = async (to, subject, text, CompanyId) => {
     });
 
     const mailOptions = {
-      from: 'jairajlakher018@gmail.com',  // Sender's email
-      to: to,                           // Recipient's email
-      subject: subject,                 // Subject of the email
-      html: text,                       // HTML content of the email
+      from: 'jairajlakher018@gmail.com',  
+      to: to,                          
+      subject: subject,                 
+      html: text,
     };
 
     const info = await transporter.sendMail(mailOptions);

@@ -12,6 +12,32 @@ export const getAllBill = async(req, res, next) => {
   const billData = await billServices.getAllBill(req, res);
   res.status(statusCodes?.created).send(billData);
 };
+
+export const getMonthlyBillData = async(req, res, next) => {
+  const billData = await billServices.getMonthlyBillData(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const totalYearlySales = async(req, res, next) => {
+  const billData = await billServices.getTotalSalesForYear(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const totalPaidBills = async(req, res, next) => {
+  const billData = await billServices.totalPaidBills(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+export const totalPendingBills = async(req, res, next) => {
+  const billData = await billServices.totalPendingBills(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+
+export const getTotalSales = async(req, res, next) => {
+  const billData = await billServices.getTotalSalesForMonth(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
 export const getBillByBookingId = async(req, res, next) => {
   const billData = await billServices.getBillByBookingId(req, res);
   res.status(statusCodes?.created).send(billData);
@@ -19,6 +45,11 @@ export const getBillByBookingId = async(req, res, next) => {
 
 export const getBillByCreaterBy = async(req, res, next) => {
   const billData = await billServices.getBillByCreaterBy(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const getAllUnpaidBillForAgent = async(req, res, next) => {
+  const billData = await billServices.getAllUnpaidBillForAgent(req, res);
   res.status(statusCodes?.created).send(billData);
 };
 export const changeBillStatus = async(req, res, next) => {
