@@ -6,6 +6,8 @@ import Owner from "../models/owner.model.js";
 import Booking from "../models/booking,model.js";
 import Company from "../models/company.model.js";
 import PropertyImg from "../models/propertyImages.model.js";
+import {sendEmail} from "../core/helpers/mail.js"
+import Type from "../models/types.model.js";
 
 export const createProperty = async (req, res) => {
   const {
@@ -48,9 +50,68 @@ export const createProperty = async (req, res) => {
     companyId,
     files: filePaths,
   });
+  const type = await Type.findById(typeId).lean();
+  const owner = await Owner.findById(ownerId).lean();
+  const CompanyDetails = await Company.findById(companyId);
+  if(CompanyDetails.isMailStatus){
+    sendMailToOwnerEmail(owner,property,CompanyDetails,type);
+  }
 
   return property;
 };
+
+
+export const sendMailToOwnerEmail = async (owner, property, companyDetails,type) => {
+  try {
+  
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333;">
+
+        <!-- Header Section -->
+        <div style="background-color: #4CAF50; color: white; padding: 15px; text-align: center;">
+          <h2 style="margin: 0;">Congratulations on Registering Your Property with ${companyDetails.companyName}!</h2>
+        </div>
+
+        <!-- Body Section -->
+        <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
+          <p style="font-size: 16px; line-height: 1.6;">Dear ${owner.ownerName},</p>
+          <p style="font-size: 16px; line-height: 1.6;">We are excited to inform you that your property has been successfully registered with ${companyDetails.companyName}.</p>
+          <p style="font-size: 16px; line-height: 1.6;">Below are the details of your property:</p>
+          
+          <ul style="font-size: 16px; line-height: 1.6;">
+            <li><strong>Property Name:</strong> ${property.propertyname}</li>
+            <li><strong>Type:</strong> ${type.name}</li>
+            <li><strong>Description:</strong> ${property.description}</li>
+            <li><strong>Address:</strong> ${property.address}, ${property.zipcode}</li>
+            <li><strong>Area:</strong> ${property.area}</li>
+          </ul>
+
+          <p style="font-size: 16px; line-height: 1.6;">You can also view your property on the map: <a href="${property.maplink}" style="color: #4CAF50;">View Map</a></p>
+          <p style="font-size: 16px; line-height: 1.6;">Thank you for trusting us with your property registration. If you have any questions or need further assistance, feel free to reach out to us.</p>
+        </div>
+
+        <!-- Footer Section -->
+        <div style="background-color: #f4f4f4; color: #777; text-align: center; padding: 15px;">
+          <p style="margin: 0;">Best regards,</p>
+          <p style="margin: 0;"><strong>The ${companyDetails.companyName} Team</strong></p>
+          <p>${companyDetails.email}</p>
+        </div>
+      </div>
+    `;
+
+    await sendEmail(
+      owner.email,  
+      "Property Registration Confirmation",  
+      htmlContent  ,
+      companyDetails._id
+
+    );
+  } catch (err) {
+    console.error("Failed to send property registration email:", err);
+  }
+}
+
+
 
 export const editProperty = async (req, res) => {
   const propertyId = req.query.id;

@@ -5,6 +5,7 @@ import CustomError from "../utils/exception.js";
 import Booking from "../models/booking,model.js";
 import Tenant from "../models/tenant.model.js";
 import Company from "../models/company.model.js";
+import {sendEmail} from "../core/helpers/mail.js"
 
 export const createAgent = async (req, res) => {
   const { agentName, email, password, phoneNo, address, companyId } = req.body;
@@ -42,12 +43,67 @@ export const createAgent = async (req, res) => {
     companyId: companyId,
   });
 
+    const CompanyDetails = await Company.findById(companyId);
+  
+    if(CompanyDetails.isMailStatus){
+      sendAgentRegistrationEmail(newAgent,CompanyDetails);
+    }
+
   return res.status(201).json({
     success: true,
     message: "Agent created successfully!",
     data: newAgent,
   });
 };
+
+const sendAgentRegistrationEmail = async (agent, CompanyDetails) => {
+  try {
+    // Email to Agent
+    const agentDetails = `
+    <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333;">
+      
+      <!-- Header Section -->
+      <div style="background-color: #4CAF50; color: white; padding: 15px; text-align: center;">
+        <h2 style="margin: 0;">Welcome to ${CompanyDetails.companyName}, ${agent.agentName}!</h2>
+      </div>
+
+      <!-- Body Section -->
+      <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
+        <p style="font-size: 16px; line-height: 1.6;">Dear ${agent.agentName},</p>
+        <p style="font-size: 16px; line-height: 1.6;">Thank you for joining ${CompanyDetails.companyName} as an agent. We are excited to have you on board as our Agent . Below are your registration details:</p>
+        
+        <ul style="font-size: 16px; line-height: 1.6;">
+          <li><strong>Agent Name:</strong> ${agent.agentName}</li>
+          <li><strong>Email:</strong> ${agent.email}</li>
+          <li><strong>Phone Number:</strong> ${agent.phoneNo}</li>
+          <li><strong>Address:</strong> ${agent.address}</li>
+          <li><strong>Company:</strong> ${CompanyDetails.companyName}</li>
+        </ul>
+
+        <p style="font-size: 16px; line-height: 1.6;">We look forward to a successful partnership with you. If you have any questions or need assistance, feel free to contact us.</p>
+      </div>
+
+      <!-- Footer Section -->
+      <div style="background-color: #f4f4f4; color: #777; text-align: center; padding: 15px;">
+        <p style="margin: 0;">Best regards,</p>
+        <p style="margin: 0;"><strong>The ${CompanyDetails.companyName} Team</strong></p>
+        <p>${CompanyDetails.email}</p>
+      </div>
+    </div>
+    `;
+
+    // Send the email to the agent
+    return sendEmail(
+      agent.email,
+      "Welcome to Your New Role - Agent Registration Details",
+      agentDetails,
+      CompanyDetails._id
+    );
+  } catch (err) {
+    console.error("Failed to send agent registration email:", err);
+  }
+};
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {

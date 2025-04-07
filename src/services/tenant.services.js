@@ -5,6 +5,7 @@ import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 import TenantDocs from "../models/tenantDocs.model.js";
+import {sendEmail} from "../core/helpers/mail.js"
 
 export const createTenant = async (req) => {
   const {
@@ -35,8 +36,6 @@ export const createTenant = async (req) => {
     );
   }
 
-
-
   const uploadedFiles = req.files.map((file) => ({
     filetype: file.mimetype,
     name: file.originalname,
@@ -64,12 +63,63 @@ export const createTenant = async (req) => {
     );
   }
 
+  const CompanyDetails = await Company.findById(companyId);
+  if(CompanyDetails.isMailStatus){
+    sendEmailToTenant(tenant,CompanyDetails);
+  }
+
   const createdTenant = await Tenant.findById(tenant._id).select(
     "-password -refreshToken"
   );
 
   return createdTenant;
 };
+
+const sendEmailToTenant = async (tenant, CompanyDetails) => {
+  try {
+   
+    const tenantDetails = `
+  <div style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333;">
+    
+    <!-- Header Section -->
+    <div style="background-color: #4CAF50; color: white; padding: 15px; text-align: center;">
+      <h2 style="margin: 0;">Welcome to ${CompanyDetails.companyName}</h2>
+    </div>
+
+    <!-- Body Section -->
+    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #ddd; padding: 20px; box-sizing: border-box;">
+      <p style="font-size: 16px; line-height: 1.6;">Dear ${tenant?.tenantName},</p>
+      <p style="font-size: 16px; line-height: 1.6;">Thank you for registering with <strong>${CompanyDetails.companyName}</strong>. We are excited to have you on board. Below are your registration details:</p>
+      <ul style="font-size: 16px; line-height: 1.6;">
+        <li><strong>Name:</strong> ${tenant?.tenantName}</li>
+        <li><strong>Email:</strong> ${tenant?.email}</li>
+        <li><strong>Phone:</strong> ${tenant?.phoneno}</li>
+        <li><strong>Address:</strong> ${tenant?.address}</li>
+      </ul>
+      <p style="font-size: 16px; line-height: 1.6;">We look forward to a smooth and pleasant stay. If you have any questions or need assistance, feel free to contact us.</p>
+    </div>
+
+    <!-- Footer Section -->
+    <div style="background-color: #f4f4f4; color: #777; text-align: center; padding: 15px;">
+      <p style="margin: 0;">Best regards,</p>
+      <p style="margin: 0;"><strong>The ${CompanyDetails.companyName} Team</strong></p>
+      <p>${CompanyDetails.email}</p>
+    </div>
+  </div>
+`;
+
+    // Send the email with tenant details
+    return sendEmail(
+      tenant?.email,
+      "Welcome to Your New Home - Tenant Registration Details",
+      tenantDetails,
+      CompanyDetails._id
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
+};
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {

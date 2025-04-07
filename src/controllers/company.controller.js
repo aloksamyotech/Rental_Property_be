@@ -9,6 +9,21 @@ export const companyRegistration = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
+export const addSMTPMailPassword = async (req, res) => {
+  const companyData = await companyServices.addSMTPMailPassword(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
+export const updateMailStatus = async (req, res) => {
+  const companyData = await companyServices.updateMailStatus(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
+// export const findSmtpDetails = async (req, res) => {
+//   const companyData = await companyServices.findSmtpDetails(req, res);
+//   res.status(statusCodes?.created).send(companyData);
+// };
+
 export const universalLogin = async (req, res) => {
   const data = await companyServices.universalLogin(req, res);
   res

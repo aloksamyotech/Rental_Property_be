@@ -5,6 +5,11 @@ export const database_urls = Object.freeze({
   db_name: process.env.DB_NAME || "heyreach",
 });
 
+export const bookingPrefix = Object.freeze({
+  prefix: process.env.BOOKINGPREFIX ,
+
+});
+
 export const invoicePrefix = Object.freeze({
   prefix: process.env.PREFIX ,
 
