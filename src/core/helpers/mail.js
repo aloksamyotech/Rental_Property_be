@@ -7,7 +7,7 @@ const sendEmail = async (to, subject, text, CompanyId) => {
   // const payload = await getJWTPayload(token);
   // const CompanyId = payload?.companyId;
   const smtpDetails = await findSmtpDetails(CompanyId);
-console.log(smtpDetails,"smtpDetails")
+
   try {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
@@ -26,7 +26,7 @@ console.log(smtpDetails,"smtpDetails")
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
+    // console.log('Email sent: ' + info.response);
     return info.response;
   } catch (error) {
     console.error('Failed to send email:', error);

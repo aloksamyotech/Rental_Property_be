@@ -269,6 +269,23 @@ export const getBillByT = async (req) => {
   return tenantBill;
 };
 
+export const getBillForTPending = async (req) => {
+  const tenantId = req.query.id;
+  const tenantBill = await Bill.find({ tenantId: tenantId , isDeleted: false, status:false})
+    .populate("tenantId")
+    .populate("propertyId")
+    .sort({ createdAt: -1 });
+
+  if (!tenantBill) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
+      errorCodes?.no_data_found
+    );
+  }
+  return tenantBill;
+};
+
 export const getBillByBookingId = async (req) => {
   const bookingId = req.query.id;
   const bill = await Bill.find({bookingId:bookingId})

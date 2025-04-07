@@ -52,7 +52,6 @@ export const createProperty = async (req, res) => {
   });
   const type = await Type.findById(typeId).lean();
   const owner = await Owner.findById(ownerId).lean();
-  console.log(owner,"owner");
   const CompanyDetails = await Company.findById(companyId);
   if(CompanyDetails.isMailStatus){
     sendMailToOwnerEmail(owner,property,CompanyDetails,type);
@@ -107,8 +106,6 @@ export const sendMailToOwnerEmail = async (owner, property, companyDetails,type)
       companyDetails._id
 
     );
-
-    console.log("Registration email sent successfully to owner.");
   } catch (err) {
     console.error("Failed to send property registration email:", err);
   }
