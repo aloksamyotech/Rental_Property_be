@@ -54,6 +54,7 @@ export const Message = {
   loginError: "Login Error",
   notUpdate: "Update Failed",
   serverError: "Intrnal Server Error",
+  rowMissing: "Row is missing"
 };
 
 export const errorCodes = Object.freeze({

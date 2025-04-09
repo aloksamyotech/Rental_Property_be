@@ -3,6 +3,7 @@ import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
 import Property from '../models/property.model.js'
 import Company from "../models/company.model.js";
+import ExcelJS from 'exceljs';
 
 export const registerOwner = async (req, res) => {
 
@@ -191,4 +192,86 @@ export const deleteOwner = async (req, res) => {
   owner.isDeleted = true;
   await owner.save();
   return owner
+};
+
+export const bulkUploadOwner = async (req) => {
+    const file = req?.file?.path;
+    if (!file) {
+      throw new CustomError(
+        statusCodes?.badRequest,
+        Message?.fileNotProvided,
+        errorCodes?.file_missing
+      );
+    }
+
+    const { companyId } = req.body;
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(file);
+    const worksheet = workbook.worksheets[0];
+
+    const owners = [];
+    const keysToCheck = ["ownerName", "email", "phoneNo", "address"];
+    const createdOwner = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; 
+
+      const owner = {
+        ownerName: row.getCell(1)?.text?.trim() || '',
+        email: row.getCell(2)?.text?.trim() || '',
+        phoneNo: row.getCell(3)?.text?.trim() || '',
+        address: row.getCell(4)?.text?.trim() || '',
+        companyId
+      }; 
+
+      if (!keysToCheck.every((key) => owner[key])) {
+        console.log(owner[key] ,"owner");
+        throw new CustomError(
+          statusCodes.badRequest,
+          Message?.rowMissing,
+          errorCodes.invalid_format
+        );
+      }
+
+      owners.push(owner);
+    });
+
+    for (const owner of owners) {
+        const existingOwner = await Owner.findOne({
+          $or: [
+            { ownerName: owner.ownerName, isDeleted: false },
+            { email: owner.email, isDeleted: false }
+          ]
+        });
+
+        if (existingOwner) {
+          console.log(`Owner ${owner.ownerName} already exists`);
+          continue;
+        }
+
+
+        const newOwner = await Owner.create(owner);
+        if (!newOwner) {
+          throw new CustomError(
+            statusCodes.badRequest,
+            `Failed to create Onwer ${owner.ownerName}`,
+            errorCodes.not_created
+          );
+        }
+
+        createdOwner.push(newOwner);
+
+    }
+
+    if (createdOwner.length === 0) {
+      throw new CustomError(
+        statusCodes.badRequest,
+        'No new tenants were created',
+        errorCodes.not_created
+      );
+    }
+
+    return createdOwner
+
 };

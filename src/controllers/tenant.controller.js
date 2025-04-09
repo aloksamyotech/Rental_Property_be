@@ -24,6 +24,11 @@ export const getMyTenants = async(req, res, next) => {
   res.status(statusCodes?.created).send(TenantData);
 };
 
+export const bulkUploadTenants = async(req, res, next) => {
+  const TenantData = await tenantServices.bulkUploadTenants(req, res, next);
+  res.status(statusCodes?.created).send(TenantData);
+};
+
 export const getAllDocs = async(req, res, next) => {
   const TenantData = await tenantServices.getAllDocs(req, res, next);
   res.status(statusCodes?.created).send(TenantData);
