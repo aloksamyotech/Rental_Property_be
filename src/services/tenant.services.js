@@ -5,7 +5,9 @@ import Booking from "../models/booking,model.js";
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
 import TenantDocs from "../models/tenantDocs.model.js";
-import {sendEmail} from "../core/helpers/mail.js"
+import {sendEmail} from "../core/helpers/mail.js";
+import ExcelJS from 'exceljs';
+import bcrypt from 'bcrypt'
 
 export const createTenant = async (req) => {
   const {
@@ -444,4 +446,90 @@ export const deleteTenantDocs = async (req, res) => {
     );
   }
   return tenantDocs;
+};
+
+export const bulkUploadTenants = async (req) => {
+    const file = req?.file?.path;
+    if (!file) {
+      throw new CustomError(
+        statusCodes?.badRequest,
+        Message?.fileNotProvided,
+        errorCodes?.file_missing
+      );
+    }
+
+    const { reporterId, companyId } = req.body;
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(file);
+    const worksheet = workbook.worksheets[0];
+
+    const tenants = [];
+    const keysToCheck = ["tenantName", "email", "phoneno", "identityCardType", "identityNo"];
+    const createdTenants = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; 
+
+      const tenant = {
+        tenantName: row.getCell(1)?.text?.trim() || '',
+        password: '1234', 
+        email: row.getCell(2)?.text?.trim() || '',
+        phoneno: row.getCell(3)?.text?.trim() || '',
+        identityCardType: row.getCell(4)?.text?.trim() || '',
+        identityNo: row.getCell(5)?.text?.trim() || '',
+        reporterId,
+        companyId
+      };
+
+      // Validate required fields
+      if (!keysToCheck.every((key) => tenant[key])) {
+        throw new CustomError(
+          statusCodes.badRequest,
+          Message?.rowMissing,
+          errorCodes.invalid_format
+        );
+      }
+
+      tenants.push(tenant);
+    });
+
+    for (const tenant of tenants) {
+        const existingTenant = await Tenant.findOne({
+          $or: [
+            { tenantName: tenant.tenantName, isDeleted: false },
+            { email: tenant.email, isDeleted: false }
+          ]
+        });
+
+        if (existingTenant) {
+          continue;
+        }
+
+        const hashedPassword = await bcrypt.hash(tenant.password, 10);
+        tenant.password = hashedPassword;
+
+        const newTenant = await Tenant.create(tenant);
+        if (!newTenant) {
+          throw new CustomError(
+            statusCodes.badRequest,
+            `Failed to create tenant ${tenant.tenantName}`,
+            errorCodes.not_created
+          );
+        }
+
+        createdTenants.push(newTenant);
+
+    }
+
+    if (createdTenants.length === 0) {
+      throw new CustomError(
+        statusCodes.badRequest,
+        'No new tenants were created',
+        errorCodes.not_created
+      );
+    }
+
+    return createdTenants
+
 };

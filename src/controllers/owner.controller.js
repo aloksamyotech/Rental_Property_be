@@ -19,6 +19,11 @@ export const getAllOwner = async(req, res) => {
   res.status(statusCodes?.created).send(ownerData);
 };
 
+export const bulkUploadOwner = async(req, res) => {
+  const ownerData = await ownerService.bulkUploadOwner(req, res);
+  res.status(statusCodes?.created).send(ownerData);
+};
+
 export const deleteOwner = async(req, res) => {
   const ownerData = await ownerService.deleteOwner(req, res);
   res.status(statusCodes?.created).send(ownerData);
