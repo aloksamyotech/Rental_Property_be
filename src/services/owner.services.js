@@ -226,14 +226,12 @@ export const bulkUploadOwner = async (req) => {
       }; 
 
       if (!keysToCheck.every((key) => owner[key])) {
-        console.log(owner[key] ,"owner");
         throw new CustomError(
           statusCodes.badRequest,
           Message?.rowMissing,
           errorCodes.invalid_format
         );
       }
-
       owners.push(owner);
     });
 
@@ -246,7 +244,6 @@ export const bulkUploadOwner = async (req) => {
         });
 
         if (existingOwner) {
-          console.log(`Owner ${owner.ownerName} already exists`);
           continue;
         }
 
@@ -255,7 +252,7 @@ export const bulkUploadOwner = async (req) => {
         if (!newOwner) {
           throw new CustomError(
             statusCodes.badRequest,
-            `Failed to create Onwer ${owner.ownerName}`,
+            Message.ownerMissing.
             errorCodes.not_created
           );
         }
@@ -267,7 +264,7 @@ export const bulkUploadOwner = async (req) => {
     if (createdOwner.length === 0) {
       throw new CustomError(
         statusCodes.badRequest,
-        'No new tenants were created',
+        Message.noNewOwner,
         errorCodes.not_created
       );
     }

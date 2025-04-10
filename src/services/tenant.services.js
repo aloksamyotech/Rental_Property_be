@@ -503,7 +503,6 @@ export const bulkUploadTenants = async (req) => {
         });
 
         if (existingTenant) {
-          console.log(`Tenant ${tenant.tenantName} already exists`);
           continue;
         }
 
@@ -520,7 +519,6 @@ export const bulkUploadTenants = async (req) => {
         }
 
         createdTenants.push(newTenant);
-        console.log('Created tenant:', newTenant.tenantName);
 
     }
 

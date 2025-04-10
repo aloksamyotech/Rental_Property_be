@@ -39,6 +39,8 @@ export const Message = {
   missingId:"Missing Id",
   missing_field :"Misiing Field",
   notFound: "Not Found",
+  noNewOwner:"No new tenants were created",
+  ownerMissing:"Failed to create Onwer",
   registerSuccessfully: "Successfully Registered",
   inValid: "Invalid Credentials",
   successfullyUpdate: "Updated Successfully",
