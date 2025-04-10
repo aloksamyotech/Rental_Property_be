@@ -21,6 +21,7 @@ import serviceProviderRoutes from './src/routes/serviceProvider.routes.js';
 import path from "path";
 import AnnouncementRoutes from './src/routes/announcment.routes.js';
 import extraChargeRoutes from "./src/routes/extracharge.routes.js";
+import subscriptionRoutes from './src/routes/subscricription.routes.js'
 import mongoose from 'mongoose';
 
 const app = express();
@@ -63,6 +64,7 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/serviceProvider', serviceProviderRoutes);
 app.use('/api/v1/announcement', AnnouncementRoutes);
 app.use('/api/v1/extraCharge', extraChargeRoutes);
+app.use('/api/v1/subscription', subscriptionRoutes);
 
 app.use(globalExceptionHandler);
 
