@@ -50,6 +50,13 @@ const companySchema = new Schema(
     refreshToken: {
       type: String
     },
+    subcriptionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subscription"
+    },
+    subcriptionBuyDate:{
+      type: Date
+    }
   },
   { timestamps: true },
 );
@@ -90,6 +97,7 @@ companySchema.methods.generateRefreshToken = function () {
   return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
+
 };
 
 const Company = mongoose.model("Company", companySchema);
