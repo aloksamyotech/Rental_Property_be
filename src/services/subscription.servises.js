@@ -2,8 +2,6 @@
 import  Subscription from "../models/subscription.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
-import { NOTFOUND } from "dns";
-
 
 export const createSubscription = async (req, res) => {
 
