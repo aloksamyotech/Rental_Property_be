@@ -5,6 +5,9 @@ import CustomError from "../utils/exception.js";
 import Agent from "../models/agents.model.js";
 import Tenant from "../models/tenant.model.js";
 import Complaint from "../models/complaints.model.js";
+import Property from "../models/property.model.js";
+import Subscription from "../models/subscription.model.js";
+import { commentAndResolved } from "../controllers/company.controller.js";
 
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
@@ -255,6 +258,38 @@ export const getAllCompany = async (req) => {
   return AllComp;
 };
 
+export const totalActiveCompany = async (req) => {
+  const AllComp = await Company.find({ isDeleted: false , status: true}).sort({
+    createdAt: -1,
+  });
+
+  if (!AllComp) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  return AllComp;
+};
+
+export const companySubscriptionDetails = async (req) => {
+  const AllComp = await Company.find({ isDeleted: false })
+  .populate("subcriptionId")
+
+
+  if (!AllComp) {
+    throw new CustomError(
+      statusCodes?.conflict,
+      Message?.alreadyExist,
+      errorCodes?.already_exist
+    );
+  }
+
+  return AllComp;
+};
+
 export const getCompanyById = async (req) => {
   const companyId = req.query.id;
   const companyDetails = await Company.findById(companyId);
@@ -356,6 +391,49 @@ export const updateMailStatus = async (req, res) => {
   return company;
 
 };
+
+export const addSubcriptionPlan = async (req, res) => {
+  const {companyId, SubscriptionId,  buyDate } = req.body;
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound ,
+      errorCodes?.not_found
+    );
+  }
+  company.subcriptionId = SubscriptionId;
+  company.subcriptionBuyDate = buyDate;
+  await company.save();
+
+  return company;
+
+};
+
+export const getTotalData = async (req) => {
+  const company = await Company.find({ isDeleted: false });
+  const tenant = await Tenant.find({ isDeleted: false });
+  const agent = await Agent.find({ isDeleted: false });
+  const properties = await Property.find({ isDeleted: false });
+  const subscriptionPlan = await Subscription.find();
+  const activeCompany = await Company.find({ isDeleted: false, status: true });
+
+  const formattedData = [
+    company.length,
+    tenant.length,
+    agent.length,
+    properties.length,
+    subscriptionPlan.length,
+    activeCompany.length,
+  ];
+
+  return formattedData;
+  
+};
+
+
+
 
 
 

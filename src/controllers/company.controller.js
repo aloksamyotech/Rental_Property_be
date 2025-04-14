@@ -19,10 +19,25 @@ export const updateMailStatus = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
-// export const findSmtpDetails = async (req, res) => {
-//   const companyData = await companyServices.findSmtpDetails(req, res);
-//   res.status(statusCodes?.created).send(companyData);
-// };
+export const totalData = async (req, res) => {
+  const companyData = await companyServices.getTotalData(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
+export const totalActiveCompany = async (req, res) => {
+  const companyData = await companyServices.totalActiveCompany(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
+export const addSubcriptionPlan = async (req, res) => {
+  const companyData = await companyServices.addSubcriptionPlan(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
+export const companySubscriptionDetails = async (req, res) => {
+  const companyData = await companyServices.companySubscriptionDetails(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
 
 export const universalLogin = async (req, res) => {
   const data = await companyServices.universalLogin(req, res);
