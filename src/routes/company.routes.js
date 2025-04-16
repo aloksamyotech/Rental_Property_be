@@ -2,7 +2,7 @@ import { Router } from "express";
 import { asyncHandler } from "../utils/asyncWrapper.js";
 const router = Router();
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import {companyRegistration, universalLogin, getAllCompany,editCompany,totalData, deleteCompany,totalActiveCompany,commentAndResolved,addSubcriptionPlan,getCompanyById,changestatus,addSMTPMailPassword,updateMailStatus,companySubscriptionDetails} from "../controllers/company.controller.js"
+import {companyRegistration, universalLogin, getAllCompany,editCompany,totalData, deleteCompany,changePassword,totalActiveCompany,commentAndResolved,addSubcriptionPlan,getCompanyById,changestatus,addSMTPMailPassword,updateMailStatus,companySubscriptionDetails} from "../controllers/company.controller.js"
 
 router.post("/register", asyncHandler(companyRegistration));
 router.get("/getAllCompanies", asyncHandler(getAllCompany))
@@ -21,6 +21,7 @@ router.get("/getCompananySubcription", asyncHandler(companySubscriptionDetails))
 router.get("/totalActiveCompany", asyncHandler(totalActiveCompany));
 
 router.get("/totalData", asyncHandler(totalData));
+router.patch("/changePassword", asyncHandler(changePassword))
 
 
 export default router;
