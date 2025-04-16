@@ -1,0 +1,39 @@
+name: Deploy to Prod
+
+on:
+  push:
+    branches:
+      - "prod"
+
+jobs:
+  redeploy_backend:
+    name: Deploy Backend to Prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies and build
+        run: |
+          npm install -f
+          npm run build
+        continue-on-error: false
+
+      - name: SSH Into Server and Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 165.22.218.55
+          username: root
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          script: |
+            cd /
+            cd /products/rental_property_management/backend/Rental_Property_be
+            git stash
+            git fetch --all
+            git checkout prod
+            git pull origin prod
+            git log -1
+            npm install
+            pm2 restart rental

@@ -27,7 +27,7 @@ import mongoose from 'mongoose';
 const app = express();
 const PORT = (() => {
     const env = process.env.ENV;
-    return env === 'development' ? 7200 : 4545;
+    return env === 'development' ? 7004 : 7004 ;
 })();
 
 app.use(express.json());
