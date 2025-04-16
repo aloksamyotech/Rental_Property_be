@@ -37,8 +37,6 @@ app.use((req, res, next) => {
     logger.info(`Incoming request: ${req.method} ${req.originalUrl}`);
     next();
 });
-
-// await mongoose.connect('mongodb+srv://rental_property:rental_property%40samyotech2024@cluster0.kv1f8.mongodb.net/rms?retryWrites=true&w=majority&appName=Cluster0')
 console.log('database connected successfully');
 connectDB()
     .then(() => {
