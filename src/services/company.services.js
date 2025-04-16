@@ -8,7 +8,7 @@ import Complaint from "../models/complaints.model.js";
 import Property from "../models/property.model.js";
 import Subscription from "../models/subscription.model.js";
 import { commentAndResolved } from "../controllers/company.controller.js";
-
+import bcrypt from 'bcrypt';
 export const companyRegistration = async (req) => {
   const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
   // const isCompanyAlreadyExist = await Company.findOne({ email });
@@ -88,6 +88,22 @@ export const findSmtpDetails = async (CompanyId) => {
     };
 
     return smtp;
+};
+
+export const changePassword = async (req) => {
+  const { companyId, newPassword } = req.body;
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const result = await Company.findByIdAndUpdate(
+       companyId,
+      {
+        $set: {
+          password: hashedPassword,
+        },
+      }
+    );
+    return result;
 };
 
 // export const companyLogin = async (req, res) => {
@@ -429,7 +445,7 @@ export const getTotalData = async (req) => {
   ];
 
   return formattedData;
-  
+
 };
 
 

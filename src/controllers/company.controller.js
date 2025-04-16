@@ -14,6 +14,11 @@ export const addSMTPMailPassword = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
+export const changePassword = async (req, res) => {
+  const companyData = await companyServices.changePassword(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
+
 export const updateMailStatus = async (req, res) => {
   const companyData = await companyServices.updateMailStatus(req, res);
   res.status(statusCodes?.created).send(companyData);
