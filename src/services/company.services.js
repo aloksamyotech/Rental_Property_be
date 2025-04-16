@@ -94,7 +94,6 @@ export const changePassword = async (req) => {
   const { companyId, newPassword } = req.body;
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-    console.log("hashedPassword =>", hashedPassword);
 
     const result = await Company.findByIdAndUpdate(
        companyId,
