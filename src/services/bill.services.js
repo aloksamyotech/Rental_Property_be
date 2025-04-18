@@ -142,13 +142,53 @@ export const createbill = async (req, res) => {
 
      const CompanyDetails = await Company.findById(companyId);
     
-      if(CompanyDetails.isMailStatus){
+     if(process.env.FEATURE_EMAIL == 'on' && CompanyDetails.isMailStatus){
         sendTenantBillEmail(newBill,property,CompanyDetails,tenant);
+      }
+      if (process.env.FEATURE_WHATSAAP == 'on' && CompanyDetails.whatappStatus) {
+        await sendWhatsAppMessage(newBill,property,CompanyDetails,tenant);
       }
   
 
   return newBill;
 };
+
+const sendWhatsAppMessage = async (newBill,property,CompanyDetails,tenant) => {
+  try {
+   
+    const tenantBillWhatsAppText = `
+🧾 *Your Monthly Bill - ${CompanyDetails.companyName}*
+
+Hi ${tenant.tenantName},
+
+Here are your billing details for ${property.propertyname}:
+
+• 🧮 *Invoice No:* ${newBill.invoiceNo}
+• 📅 *Month:* ${new Date(newBill.billingMonth).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+• 💰 *Rent:* $${newBill.rentAmount}
+${newBill.extraCharges && newBill.extraCharges.length > 0
+  ? newBill.extraCharges.map(charge => `• ➕ ${charge.serviceName}: $${charge.price}`).join('\n')
+  : '• ➕ Extra Charges: None'}
+• 🧾 *GST (${newBill.gstpercent}%):* $${newBill.totalgst}
+• 💵 *Total After GST:* $${newBill.totalBillAmountAfterGST}
+• 📝 *Note:* ${newBill.note || "No additional notes"}
+• 📌 *Payment Status:* ${newBill.status ? "✅ Paid" : "❌ Pending"}
+
+Please make the payment by the due date. Reach us at ${CompanyDetails.email} if you have any questions.
+
+— ${CompanyDetails.companyName} Team
+`;
+
+    
+    return sendWhatsApp(
+      tenant?.phoneno,
+      tenantBillWhatsAppText
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
+};
+
 
 const sendTenantBillEmail = async (newBill, property, CompanyDetails, tenant) => {
   try {

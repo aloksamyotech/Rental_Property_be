@@ -152,7 +152,7 @@ export const editComplain = async(req, res, next) => {
       errorCodes?.service_unavailable,
     );
   }
-    return editComplain;
+  return editComplain;
 };
 
 export const deleteComplain = async (req, res) => {

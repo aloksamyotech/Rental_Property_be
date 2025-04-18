@@ -7,7 +7,8 @@ import Company from "../models/company.model.js";
 import TenantDocs from "../models/tenantDocs.model.js";
 import {sendEmail} from "../core/helpers/mail.js";
 import ExcelJS from 'exceljs';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
+import sendWhatsApp from "../core/helpers/twillio.js"
 
 export const createTenant = async (req) => {
   const {
@@ -66,8 +67,11 @@ export const createTenant = async (req) => {
   }
 
   const CompanyDetails = await Company.findById(companyId);
-  if(CompanyDetails.isMailStatus){
-    sendEmailToTenant(tenant,CompanyDetails);
+  if(process.env.FEATURE_EMAIL == 'on' && CompanyDetails.isMailStatus){
+   await sendEmailToTenant(tenant,CompanyDetails);
+  }
+  if (process.env.FEATURE_WHATSAAP == 'on' && CompanyDetails.whatappStatus) {
+  await sendWhatsAppMessage(tenant, CompanyDetails);
   }
 
   const createdTenant = await Tenant.findById(tenant._id).select(
@@ -76,6 +80,35 @@ export const createTenant = async (req) => {
 
   return createdTenant;
 };
+
+const sendWhatsAppMessage = async (tenant, CompanyDetails) => {
+  try {
+   
+    const tenantWhatsAppText = 
+    `👋 Hey ${tenant?.tenantName}!
+    
+    Welcome to *${CompanyDetails.companyName}* 🎉
+    
+    Thank you for registering with us. Here are your registration details:
+    
+    📛 Name: ${tenant?.tenantName}
+    📧 Email: ${tenant?.email}
+    📱 Phone: ${tenant?.phoneno}
+    🏠 Address: ${tenant?.address}
+    
+    If you have any questions, feel free to reach out to us at: ${CompanyDetails.email}
+    
+    - The ${CompanyDetails.companyName} Team`;
+    
+    return sendWhatsApp(
+      tenant?.phoneno,
+      tenantWhatsAppText
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
+};
+
 
 const sendEmailToTenant = async (tenant, CompanyDetails) => {
   try {
