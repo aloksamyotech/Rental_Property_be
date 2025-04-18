@@ -57,15 +57,53 @@ export const createBooking = async (req, res) => {
 
   
   const CompanyDetails = await Company.findById(companyId);
-
-  if(CompanyDetails.isMailStatus){
-    sendBookingConfirmationEmail(tenant,property,CompanyDetails,newBooking);
+  if(process.env.FEATURE_EMAIL == 'on' && CompanyDetails.isMailStatus){
+    await sendBookingConfirmationEmail(tenant,property,CompanyDetails,newBooking);
   }
+
+  if (process.env.FEATURE_WHATSAAP == 'on' && CompanyDetails.whatappStatus) {
+    await sendWhatsAppMessage(tenant, property, CompanyDetails, newBooking);
+  }
+  
+
 
   return newBooking;
 };
 
 
+
+const sendWhatsAppMessage = async (tenant,property,CompanyDetails,newBooking) => {
+  try {
+   
+    const bookingWhatsAppText = `
+    ✅ Hello ${tenant.tenantName},
+    
+    Your booking with *${CompanyDetails.companyName}* is confirmed! 🎉
+    
+    📌 *Booking Details:*
+    • 🆔 Booking ID: ${newBooking.bookingNo}
+    • 🏠 Property: ${property.propertyname}
+    • 🗓️ Check-in: ${new Date(newBooking.startingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    • 🗓️ Check-out: ${new Date(newBooking.endingDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    • 💰 Rent: $${newBooking.rentAmount}
+    • 💵 Advance Paid: $${newBooking.advanceAmount}
+    
+    We look forward to hosting you at *${property.propertyname}*. 
+    Questions? Reach us at 📧 ${CompanyDetails.email}.
+    
+    — The ${CompanyDetails.companyName} Team
+    `;
+    
+
+    
+    return sendWhatsApp(
+      tenant?.phoneno,
+      bookingWhatsAppText
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
+};
 
 
 const sendBookingConfirmationEmail = async (tenant,property, CompanyDetails, newBooking) => {

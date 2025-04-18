@@ -53,13 +53,47 @@ export const createProperty = async (req, res) => {
   const type = await Type.findById(typeId).lean();
   const owner = await Owner.findById(ownerId).lean();
   const CompanyDetails = await Company.findById(companyId);
-  if(CompanyDetails.isMailStatus){
-    sendMailToOwnerEmail(owner,property,CompanyDetails,type);
+  if(process.env.FEATURE_EMAIL == 'on' && CompanyDetails.isMailStatus){
+   await sendMailToOwnerEmail(owner,property,CompanyDetails,type);
   }
+  if (process.env.FEATURE_WHATSAAP == 'on' && CompanyDetails.whatappStatus) {
+    await sendWhatsAppMessage(owner,property,CompanyDetails,type);
+    }
 
   return property;
 };
 
+
+const sendWhatsAppMessage = async (owner,property,CompanyDetails,type) => {
+  try {
+   
+    const ownerWhatsAppText = `
+    🎉 Hello ${owner.ownerName},
+    
+    Your property has been successfully registered with *${CompanyDetails.companyName}*! 🏡
+    
+    📝 Property Details:
+    • 🏠 Name: ${property.propertyname}
+    • 📂 Type: ${type.name}
+    • 🧾 Description: ${property.description}
+    • 📍 Address: ${property.address}, ${property.zipcode}
+    • 📏 Area: ${property.area}
+    
+    🌐 View it on the map: ${property.maplink}
+    
+    Thank you for trusting us. If you have any questions, reach us at 📧 ${CompanyDetails.email}.
+    
+    — The ${CompanyDetails.companyName} Team
+    `;
+    
+    return sendWhatsApp(
+      owner?.phoneNo,
+      ownerWhatsAppText
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
+};
 
 export const sendMailToOwnerEmail = async (owner, property, companyDetails,type) => {
   try {

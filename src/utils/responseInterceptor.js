@@ -1,3 +1,5 @@
+import { encryptResponse } from "../core/common/crypto.js";
+
 const responseInterceptor = (req, res, next) => {
   const oldSend = res.json;
 
@@ -12,8 +14,9 @@ const responseInterceptor = (req, res, next) => {
         error: data.errorCode || data.message || "Unknown Error",
         timestamp: new Date().toISOString(),
       };
-      console.log("formattedResponse", formattedResponse);
-      oldSend.call(res, formattedResponse);
+      // console.log("formattedResponse", formattedResponse);
+      const encryptedResponseData = encryptResponse(formattedResponse)
+      oldSend.call(res, encryptedResponseData);
     } else {
       const formattedResponse = {
         success: true,
@@ -22,8 +25,9 @@ const responseInterceptor = (req, res, next) => {
         error: null,
         timestamp: new Date().toISOString(),
       };
-      oldSend.call(res, formattedResponse);
-    }
+      const encryptedResponseData = encryptResponse(formattedResponse)
+      oldSend.call(res, encryptedResponseData);   
+     }
   };
 
   res.error = (error, statusCode = 500, message = "Internal Server Error") => {
@@ -35,7 +39,8 @@ const responseInterceptor = (req, res, next) => {
       timestamp: new Date().toISOString(),
     };
 
-    res.status(statusCode).json(formattedResponse);
+    const encryptedResponseData = encryptResponse(formattedResponse)
+    res.status(statusCode).json(encryptedResponseData);
   };
 
   next();

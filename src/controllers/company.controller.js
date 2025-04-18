@@ -24,6 +24,11 @@ export const updateMailStatus = async (req, res) => {
   res.status(statusCodes?.created).send(companyData);
 };
 
+
+export const updateWhataapStatus = async (req, res) => {
+  const companyData = await companyServices.updateWhataapStatus(req, res);
+  res.status(statusCodes?.created).send(companyData);
+};
 export const totalData = async (req, res) => {
   const companyData = await companyServices.getTotalData(req, res);
   res.status(statusCodes?.created).send(companyData);
