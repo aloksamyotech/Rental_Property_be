@@ -7,7 +7,7 @@ const secretKey = 'my-secret-key-123';
 
 
 export const encrypt = (plainText) => {
-    console.log("decryptedTextdecryptedText", plainText)
+    
     plainText = JSON.stringify(plainText)
     const encrypted = CryptoJS.AES.encrypt(plainText, secretKey).toString();
     return encrypted
