@@ -56,7 +56,11 @@ const companySchema = new Schema(
     },
     subcriptionBuyDate:{
       type: Date
-    }
+    },
+    whatappStatus:{
+      type: Boolean,
+      default: false
+    },
   },
   { timestamps: true },
 );

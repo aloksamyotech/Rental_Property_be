@@ -8,23 +8,32 @@ import Complaint from "../models/complaints.model.js";
 import Property from "../models/property.model.js";
 import Subscription from "../models/subscription.model.js";
 import { commentAndResolved } from "../controllers/company.controller.js";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 export const companyRegistration = async (req) => {
-  const { companyName, email, password, phoneNo, address , currencyCode, gstnumber} = req.body;
+  const {
+    companyName,
+    email,
+    password,
+    phoneNo,
+    address,
+    currencyCode,
+    gstnumber,
+  } = req.body;
   // const isCompanyAlreadyExist = await Company.findOne({ email });
 
-  const [isCompanyAlreadyExist, isAgentAlreadyExist, isTenantAlreadyExist] = await Promise.all([
-    Company.findOne({ email , isDeleted: false }),
-    Agent.findOne({ email  , isDeleted: false }),
-    Tenant.findOne({ email , isDeleted: false})
-  ]);
-  
+  const [isCompanyAlreadyExist, isAgentAlreadyExist, isTenantAlreadyExist] =
+    await Promise.all([
+      Company.findOne({ email, isDeleted: false }),
+      Agent.findOne({ email, isDeleted: false }),
+      Tenant.findOne({ email, isDeleted: false }),
+    ]);
+
   if (isCompanyAlreadyExist || isAgentAlreadyExist || isTenantAlreadyExist) {
     throw new CustomError(
       statusCodes?.conflict,
       Message?.alreadyExist,
       errorCodes?.already_exist
-    )
+    );
   }
 
   const company = await Company.create({
@@ -34,7 +43,7 @@ export const companyRegistration = async (req) => {
     phoneNo,
     address,
     currencyCode,
-    gstnumber
+    gstnumber,
   });
 
   const createdCompany = await Company.findById(company._id).select(
@@ -49,45 +58,48 @@ export const companyRegistration = async (req) => {
     );
   }
   return createdCompany;
-
 };
 
-
 export const addSMTPMailPassword = async (req) => {
+  const { id, smtpMail, smtpCode } = req.body;
 
-      const { id, smtpMail, smtpCode } = req.body;
+  if (!id) {
+    throw new CustomError(
+      statusCodes.badRequest,
+      "Invalid Company ID",
+      errorCodes.invalid_request
+    );
+  }
 
-      if (!id) {
-        throw new CustomError(statusCodes.badRequest, "Invalid Company ID", errorCodes.invalid_request);
-      }
-  
-      const companyMailSMTP = await Company.findByIdAndUpdate(
-        id, 
-        { smtpMail, smtpCode },
-        { new: true, runValidators: true }
-      );
-  
-      if (!companyMailSMTP) {
-        throw new CustomError(statusCodes.notFound, Message.notFound, errorCodes.not_found);
-      }
+  const companyMailSMTP = await Company.findByIdAndUpdate(
+    id,
+    { smtpMail, smtpCode },
+    { new: true, runValidators: true }
+  );
 
-      return companyMailSMTP;
-  
+  if (!companyMailSMTP) {
+    throw new CustomError(
+      statusCodes.notFound,
+      Message.notFound,
+      errorCodes.not_found
+    );
+  }
+
+  return companyMailSMTP;
 };
 
 export const findSmtpDetails = async (CompanyId) => {
+  const companyDetails = await Company.findOne({ _id: CompanyId });
+  if (!companyDetails) {
+    return false;
+  }
 
-    const companyDetails = await Company.findOne({ _id: CompanyId});
-    if (!companyDetails) {
-      return false;
-    }
+  const smtp = {
+    key: companyDetails?.smtpCode,
+    mail: companyDetails?.smtpMail,
+  };
 
-    const smtp = {
-      key: companyDetails?.smtpCode,
-      mail: companyDetails?.smtpMail,
-    };
-
-    return smtp;
+  return smtp;
 };
 
 export const changePassword = async (req) => {
@@ -95,15 +107,12 @@ export const changePassword = async (req) => {
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    const result = await Company.findByIdAndUpdate(
-       companyId,
-      {
-        $set: {
-          password: hashedPassword,
-        },
-      }
-    );
-    return result;
+  const result = await Company.findByIdAndUpdate(companyId, {
+    $set: {
+      password: hashedPassword,
+    },
+  });
+  return result;
 };
 
 // export const companyLogin = async (req, res) => {
@@ -158,10 +167,18 @@ export const universalLogin = async (req, res) => {
 
   let user = null;
 
-  const company = await Company.findOne({ email, isDeleted: false , status : true});
-   const agent = await Agent.findOne({ email, isDeleted: false , status : true});
-  const tenant = await Tenant.findOne({ email, isDeleted: false , status : true});
-  
+  const company = await Company.findOne({
+    email,
+    isDeleted: false,
+    status: true,
+  });
+  const agent = await Agent.findOne({ email, isDeleted: false, status: true });
+  const tenant = await Tenant.findOne({
+    email,
+    isDeleted: false,
+    status: true,
+  });
+
   if (company) {
     user = company;
   } else if (agent) {
@@ -202,13 +219,13 @@ export const universalLogin = async (req, res) => {
   };
 
   // Return the response
-  return res.status(200).json({
+  return {
     user: loggedInUser,
     role: user.role,
     accessToken,
     refreshToken,
     options,
-  });
+  };
 };
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -256,8 +273,6 @@ const generateAccessAndRefreshTokens = async (userId) => {
   return { accessToken, refreshToken };
 };
 
-
-
 export const getAllCompany = async (req) => {
   const AllComp = await Company.find({ isDeleted: false }).sort({
     createdAt: -1,
@@ -275,7 +290,7 @@ export const getAllCompany = async (req) => {
 };
 
 export const totalActiveCompany = async (req) => {
-  const AllComp = await Company.find({ isDeleted: false , status: true}).sort({
+  const AllComp = await Company.find({ isDeleted: false, status: true }).sort({
     createdAt: -1,
   });
 
@@ -291,9 +306,9 @@ export const totalActiveCompany = async (req) => {
 };
 
 export const companySubscriptionDetails = async (req) => {
-  const AllComp = await Company.find({ isDeleted: false })
-  .populate("subcriptionId")
-
+  const AllComp = await Company.find({ isDeleted: false }).populate(
+    "subcriptionId"
+  );
 
   if (!AllComp) {
     throw new CustomError(
@@ -345,7 +360,7 @@ export const deleteCompany = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound ,
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -364,7 +379,7 @@ export const changestatus = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound ,
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -373,18 +388,14 @@ export const changestatus = async (req, res) => {
   company.status = newCompanyStatus;
   await company.save();
 
-  await Agent.updateMany(
-    { companyId },
-    { $set: { status: newCompanyStatus } }
-  );
+  await Agent.updateMany({ companyId }, { $set: { status: newCompanyStatus } });
 
   await Tenant.updateMany(
     { companyId },
     { $set: { status: newCompanyStatus } }
   );
 
-    return company;
-
+  return company;
 };
 
 export const updateMailStatus = async (req, res) => {
@@ -395,7 +406,7 @@ export const updateMailStatus = async (req, res) => {
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound ,
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -405,17 +416,36 @@ export const updateMailStatus = async (req, res) => {
   await company.save();
 
   return company;
-
 };
 
-export const addSubcriptionPlan = async (req, res) => {
-  const {companyId, SubscriptionId,  buyDate } = req.body;
+export const updateWhataapStatus = async (req, res) => {
+  const companyId = req.body.id;
+
   const company = await Company.findById(companyId);
 
   if (!company) {
     throw new CustomError(
       statusCodes?.notFound,
-      Message?.notFound ,
+      Message?.notFound,
+      errorCodes?.not_found
+    );
+  }
+
+  const newStatus = !company.whatappStatus;
+  company.whatappStatus = newStatus;
+  await company.save();
+
+  return company;
+};
+
+export const addSubcriptionPlan = async (req, res) => {
+  const { companyId, SubscriptionId, buyDate } = req.body;
+  const company = await Company.findById(companyId);
+
+  if (!company) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound,
       errorCodes?.not_found
     );
   }
@@ -424,7 +454,6 @@ export const addSubcriptionPlan = async (req, res) => {
   await company.save();
 
   return company;
-
 };
 
 export const getTotalData = async (req) => {
@@ -445,13 +474,7 @@ export const getTotalData = async (req) => {
   ];
 
   return formattedData;
-
 };
-
-
-
-
-
 
 // export const commentAndResolved = async (req, res) => {
 //   const companyId = req.query.id;

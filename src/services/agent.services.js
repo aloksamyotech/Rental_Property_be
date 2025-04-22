@@ -46,14 +46,50 @@ export const createAgent = async (req, res) => {
     const CompanyDetails = await Company.findById(companyId);
   
     if(CompanyDetails.isMailStatus){
-      sendAgentRegistrationEmail(newAgent,CompanyDetails);
+      await sendAgentRegistrationEmail(newAgent,CompanyDetails);
     }
+    if(CompanyDetails.whatappStatus){
+      await sendWhatsAppMessage(newAgent, CompanyDetails);
+      }
 
   return res.status(201).json({
     success: true,
     message: "Agent created successfully!",
     data: newAgent,
   });
+};
+
+
+const sendWhatsAppMessage = async (tenant, CompanyDetails) => {
+  try {
+   
+    const agentWhatsAppText = `
+👋 Hey ${agent.agentName}!
+
+Welcome to *${CompanyDetails.companyName}*! 🎉
+
+Thanks for joining us as an *Agent*. We're excited to have you on board.
+
+📝 Your Registration Details:
+• 👤 Name: ${agent.agentName}
+• 📧 Email: ${agent.email}
+• 📞 Phone: ${agent.phoneNo}
+• 🏠 Address: ${agent.address}
+• 🏢 Company: ${CompanyDetails.companyName}
+
+If you have any questions, feel free to reach out to us at ${CompanyDetails.email}.
+
+— The ${CompanyDetails.companyName} Team
+`;
+
+    
+    return sendWhatsApp(
+      tenant?.phoneno,
+      agentWhatsAppText
+    );
+  } catch (err) {
+    console.error("Failed to send tenant registration email:", err);
+  }
 };
 
 const sendAgentRegistrationEmail = async (agent, CompanyDetails) => {
@@ -103,6 +139,7 @@ const sendAgentRegistrationEmail = async (agent, CompanyDetails) => {
     console.error("Failed to send agent registration email:", err);
   }
 };
+
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
