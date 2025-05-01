@@ -5,7 +5,8 @@ import CustomError from "../utils/exception.js";
 import Booking from "../models/booking,model.js";
 import Tenant from "../models/tenant.model.js";
 import Company from "../models/company.model.js";
-import {sendEmail} from "../core/helpers/mail.js"
+import {sendEmail} from "../core/helpers/mail.js";
+import bcrypt from 'bcrypt';
 
 export const createAgent = async (req, res) => {
   const { agentName, email, password, phoneNo, address, companyId } = req.body;
@@ -296,4 +297,18 @@ export const getAgentById = async (req, res) => {
     // booking: formattedBookings,
     tenant,
   };
+};
+
+export const changePassword = async (req) => {
+  const { id, newPassword } = req.body;
+
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  const result = await Agent.findByIdAndUpdate(id, {
+    $set: {
+      password: hashedPassword,
+    },
+  });
+  return result;
 };
