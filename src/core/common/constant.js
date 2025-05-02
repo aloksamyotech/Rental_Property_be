@@ -37,6 +37,7 @@ export const statusCodes = {
 
 export const Message = {
   alreadyExist:"Already Exist",
+  invalidId:"invalidId",
   missingId:"Missing Id",
   missing_field :"Misiing Field",
   notFound: "Not Found",

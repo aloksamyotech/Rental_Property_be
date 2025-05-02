@@ -18,6 +18,11 @@ export const getMonthlyBillData = async(req, res, next) => {
   res.status(statusCodes?.created).send(billData);
 };
 
+export const getBillSummaryBetweenDates = async(req, res, next) => {
+  const billData = await billServices.getBillSummaryBetweenDates(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
 export const totalYearlySales = async(req, res, next) => {
   const billData = await billServices.getTotalSalesForYear(req, res);
   res.status(statusCodes?.created).send(billData);
@@ -29,6 +34,11 @@ export const totalPaidBills = async(req, res, next) => {
 };
 export const totalPendingBills = async(req, res, next) => {
   const billData = await billServices.totalPendingBills(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
+export const getMonthlyPaidForTenant = async(req, res, next) => {
+  const billData = await billServices.getMonthlyPaidForTenant(req, res);
   res.status(statusCodes?.created).send(billData);
 };
 
@@ -47,6 +57,12 @@ export const getBillByCreaterBy = async(req, res, next) => {
   const billData = await billServices.getBillByCreaterBy(req, res);
   res.status(statusCodes?.created).send(billData);
 };
+
+export const getMonthlyPaidBillsForAgent = async(req, res, next) => {
+  const billData = await billServices.getMonthlyPaidBillsForAgent(req, res);
+  res.status(statusCodes?.created).send(billData);
+};
+
 
 export const getAllUnpaidBillForAgent = async(req, res, next) => {
   const billData = await billServices.getAllUnpaidBillForAgent(req, res);

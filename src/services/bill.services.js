@@ -12,7 +12,8 @@ import crypto from "crypto";
 import {sendEmail} from "../core/helpers/mail.js"
 import Agent from "../models/agents.model.js";
 import Company from "../models/company.model.js";
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
 
 // export const createbill = async (req, res) => {
 //   const {
@@ -409,6 +410,136 @@ export const reporterDetails = async (req) => {
   return bill;
 };
 
+
+
+export const getMonthlyPaidBillsForAgent = async (req) => {
+  const agentId = req.query.agentId;
+  const year = new Date().getFullYear();
+
+  if (!agentId) {
+    throw new Error('Invalid or missing agentId');
+  }
+
+  const result = await Bill.aggregate([
+    {
+      $match: {
+        status: true,
+        isDeleted: { $ne: true },
+        createdBy: new mongoose.Types.ObjectId(agentId),
+        updatedAt: {
+          $gte: new Date(`${year}-01-01`),
+          $lt: new Date(`${year + 1}-01-01`)
+        }
+      }
+    },
+    {
+      $group: {
+        _id: { $month: '$updatedAt' },
+        totalPaid: { $sum: '$totalBillAmountAfterGST' }
+      }
+    }
+  ]);
+
+  const monthlyTotals = Array(12).fill(0);
+
+  result.forEach(item => {
+    const monthIndex = item._id - 1;
+    monthlyTotals[monthIndex] = item.totalPaid;
+  });
+
+  return monthlyTotals;
+};
+
+
+
+
+export const getBillSummaryBetweenDates = async (req, res) => {
+    const { startDate, endDate, companyId } = req.query;
+
+    if (!startDate || !endDate || !companyId) {
+      throw new CustomError(
+        statusCodes.notFound,
+        Message.notFound,
+        errorCodes.no_data_found
+      );
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      throw new CustomError(
+        statusCodes.badRequest,
+        Message.invalidId,
+        errorCodes.validation_error
+      );
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const companyObjectId = new mongoose.Types.ObjectId(companyId);
+
+    const aggregation = await Bill.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          companyId: companyObjectId,
+          createdAt: { $gte: start, $lte: end }
+        }
+      },
+      {
+        $group: {
+          _id: '$status',
+          totalAmount: { $sum: '$totalBillAmountAfterGST' },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const bills = await Bill.find({
+      isDeleted: false,
+      companyId: companyObjectId,
+      createdAt: { $gte: start, $lte: end }
+    }).populate('tenantId propertyId bookingId companyId');
+
+    const properties = await Property.find({
+      isDeleted: false,
+      companyId: companyObjectId,
+      createdAt: { $gte: start, $lte: end }
+    });
+
+    const agents = await Agent.find({
+      isDeleted: false,
+      companyId: companyObjectId,
+      createdAt: { $gte: start, $lte: end }
+    });
+
+    const tenants = await Tenant.find({
+      isDeleted: false,
+      companyId: companyObjectId,
+      createdAt: { $gte: start, $lte: end }
+    });
+
+    const summary = {
+      totalBills: bills.length,
+      paid: { count: 0, totalAmount: 0 },
+      unpaid: { count: 0, totalAmount: 0 },
+      bills,
+      properties,
+      tenants,
+      agents
+    };
+
+
+
+    aggregation.forEach(item => {
+      if (item._id === true) {
+        summary.paid = { count: item.count, totalAmount: item.totalAmount };
+      } else {
+        summary.unpaid = { count: item.count, totalAmount: item.totalAmount };
+      }
+    });
+    return summary
+};
+
 export const changeBillStatus = async (req) => {
   const billId = req.query.id;
   const { paymentType } = req.body;
@@ -461,8 +592,7 @@ export const deleteBill = async (req, res) => {
 
 export const getMonthlyBillData = async(req,res)=>{
     const {companyId, year} = req.query;
-// Define condition object to match documents
-const condition_obj = { isDeleted: false }; // Ensure isDeleted is false
+const condition_obj = { isDeleted: false }; 
 
     if (companyId) {
       condition_obj.companyId = new mongoose.Types.ObjectId(companyId);
@@ -470,14 +600,13 @@ const condition_obj = { isDeleted: false }; // Ensure isDeleted is false
 
     if (year) {
       condition_obj.billingMonth = {
-        $gte: new Date(`${year}-01-01T00:00:00.000Z`), // Start of the year
-        $lt: new Date(`${parseInt(year) + 1}-01-01T00:00:00.000Z`), // Start of next year
+        $gte: new Date(`${year}-01-01T00:00:00.000Z`), 
+        $lt: new Date(`${parseInt(year) + 1}-01-01T00:00:00.000Z`), 
       };
     }
     
-    // Aggregation pipeline to group data by company and month
     const result = await Bill.aggregate([
-      { $match: condition_obj }, // Match documents based on filters
+      { $match: condition_obj }, 
       {
         $group: {
           _id: {
@@ -516,62 +645,6 @@ const condition_obj = { isDeleted: false }; // Ensure isDeleted is false
 
 }
 
-
-// export const getTotalSales = async (req) => {
-//   try {
-//     const { year, companyId } = req?.query; // Fetch year and companyId from query params
-//     const condition_obj = { isDeleted: false, status: true };
-
-//     if (companyId) {
-//       condition_obj["companyId"] = companyId; // Ensure companyId is used for filtering
-//     }
-
-//     if (year) {
-//       condition_obj["createdAt"] = {
-//         $gte: new Date(`${year}-01-01`),
-//         $lt: new Date(`${parseInt(year) + 1}-01-01`),
-//       };
-//     }
-
-//     // Perform the aggregation query on the Bill model
-//     const bill = await Bill.aggregate([
-//       { $match: condition_obj }, // Match the conditions including companyId and year
-//       {
-//         $project: {
-//           billingMonth: { $month: "$billingMonth" },
-//           year: { $year: "$billingMonth" },
-//           totalBillAmountAfterGST: 1, // Include the total bill amount after GST
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: { month: "$billingMonth", year: "$year", companyId: "$companyId" }, // Group by companyId, year, and month
-//           totalBillAmountAfterGST: { $sum: "$totalBillAmountAfterGST" },
-//         },
-//       },
-//       { $sort: { "_id.year": 1, "_id.month": 1 } }, // Sort by year and month
-//     ]);
-
-//     // Prepare months of the year
-//     const months = [
-//       "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-//     ];
-
-//     // Initialize an array to store the formatted data with a default of 0 for each month
-//     const formattedData = months.map((month, index) => {
-//       const monthData = bill.find(
-//         (data) => data._id.month === index + 1 && data._id.year === parseInt(year)
-//       );
-//       return monthData ? monthData.totalBillAmountAfterGST : 0;
-//     });
-
-//     // Return the formatted data (total sales by month)
-//     return formattedData;
-//   } catch (error) {
-//     console.error("Error fetching total sales for the month:", error);
-//     throw new Error("Data not found");
-//   }
-// };
 export const getTotalSalesForMonth = async (req) => {
     const { companyId, year } = req?.query;
     const condition_obj = { isDeleted: false, status: true };
@@ -615,12 +688,40 @@ export const getTotalSalesForMonth = async (req) => {
       return monthData ? monthData.total_sales_amount : 0;
     });
     return formattedData;
+};
 
+export const getMonthlyPaidForTenant = async (req) => {
+  const { tenantId, year } = req?.query;
+
+  const condition_obj = {
+    isDeleted: false,
+    status: true,
+    tenantId: new mongoose.Types.ObjectId(tenantId)
+  };
+
+  if (year) {
+    condition_obj.updatedAt = {
+      $gte: new Date(`${year}-01-01`),
+      $lt: new Date(`${parseInt(year) + 1}-01-01`)
+    };
+  }
+
+  const bills = await Bill.find(condition_obj).select('updatedAt totalBillAmountAfterGST');
+
+  // Initialize an array for each month's payment (12 months)
+  const paidArray = new Array(12).fill(0);
+
+  bills.forEach(bill => {
+    const month = bill.updatedAt.getMonth(); 
+    paidArray[month] += bill.totalBillAmountAfterGST; 
+  });
+
+  return paidArray;
 };
 
 
+
 export const getTotalSalesForYear = async (req) => {
-  // try {
     const { companyId, year } = req?.query;
     const condition_obj = { isDeleted: false,status: true  };
 
@@ -645,10 +746,7 @@ export const getTotalSalesForYear = async (req) => {
     ]);
 
     return totalYearlySales
-  // } catch (error) {
-  //   console.error("Error fetching total sales for the year:", error);
-  //   throw new Error(messages.data_not_found);
-  // }
+
 };
 
 
