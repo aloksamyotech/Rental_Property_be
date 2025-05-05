@@ -22,7 +22,7 @@ import path from "path";
 import AnnouncementRoutes from './src/routes/announcment.routes.js';
 import extraChargeRoutes from "./src/routes/extracharge.routes.js";
 import subscriptionRoutes from './src/routes/subscricription.routes.js'
-import mongoose from 'mongoose';
+import logoRoutes from './src/routes/logo.routes.js'
 
 const app = express();
 const PORT = (() => {
@@ -32,6 +32,8 @@ const PORT = (() => {
 
 app.use(express.json());
 app.use(corsConfig);
+
+
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use((req, res, next) => {
     logger.info(`Incoming request: ${req.method} ${req.originalUrl}`);
@@ -65,6 +67,7 @@ app.use('/api/v1/serviceProvider', serviceProviderRoutes);
 app.use('/api/v1/announcement', AnnouncementRoutes);
 app.use('/api/v1/extraCharge', extraChargeRoutes);
 app.use('/api/v1/subscription', subscriptionRoutes);
+app.use('/api/v1/logo', logoRoutes);
 
 app.use(globalExceptionHandler);
 

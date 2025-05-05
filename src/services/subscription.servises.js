@@ -2,6 +2,7 @@
 import  Subscription from "../models/subscription.model.js";
 import { errorCodes, Message, statusCodes } from "../core/common/constant.js";
 import CustomError from "../utils/exception.js";
+import Transaction from "../models/transaction.model.js";
 
 export const createSubscription = async (req, res) => {
 
@@ -111,4 +112,42 @@ export const getAllSubscriptions = async (req, res) => {
     );
   }
   return subscription;
+};
+
+export const getSubTransaction = async (req, res) => {
+
+  const companyId = req.query.id;
+ 
+  const transaction = await Transaction.find({companyId:companyId})
+  .populate("companyId")
+  .populate("subscriptionId")
+  .sort({ createdAt: -1 });
+
+  if (!transaction) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound ,
+      errorCodes?.not_found
+    );
+  }
+  return transaction;
+};
+
+export const getAllSubTransaction = async (req, res) => {
+
+
+  const transaction = await Transaction.find()
+  .populate("companyId")
+  .populate("subscriptionId")
+  .sort({ createdAt: -1 });
+
+  if (!transaction) {
+    throw new CustomError(
+      statusCodes?.notFound,
+      Message?.notFound ,
+      errorCodes?.not_found
+    );
+  }
+
+  return transaction;
 };
