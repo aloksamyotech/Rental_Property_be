@@ -37,8 +37,9 @@ export const statusCodes = {
 
 export const Message = {
   alreadyExist:"Already Exist",
+  invalidId:"invalidId",
   missingId:"Missing Id",
-  missing_field :"Misiing Field",
+  missing_field :" 'Missing required transaction fields'",
   notFound: "Not Found",
   noNewOwner:"No new tenants were created",
   ownerMissing:"Failed to create Onwer",
