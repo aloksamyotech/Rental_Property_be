@@ -103,11 +103,11 @@ export const findSmtpDetails = async (CompanyId) => {
 };
 
 export const changePassword = async (req) => {
-  const { companyId, newPassword } = req.body;
+  const { id, newPassword } = req.body;
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  const result = await Company.findByIdAndUpdate(companyId, {
+  const result = await Company.findByIdAndUpdate(id, {
     $set: {
       password: hashedPassword,
     },
@@ -501,3 +501,5 @@ export const getTotalData = async (req) => {
 //   }
 //   return allComplain;
 // };
+
+
