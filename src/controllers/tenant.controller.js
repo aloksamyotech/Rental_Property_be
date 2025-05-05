@@ -59,6 +59,11 @@ export const getTenants = async(req, res, next) => {
   res.status(statusCodes?.created).send(propertyData);
 };
 
+export const changePasswordTenant = async(req, res, next) => {
+  const propertyData = await tenantServices.changePassword(req, res, next);
+  res.status(statusCodes?.created).send(propertyData);
+};
+
 export const getAllTenants = async(req, res, next) => {
   const propertyData = await tenantServices.getAllTenants(req, res, next);
   res.status(statusCodes?.created).send(propertyData);

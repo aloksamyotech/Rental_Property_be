@@ -61,6 +61,9 @@ const companySchema = new Schema(
       type: Boolean,
       default: false
     },
+    companyLogo:{
+      type: String,
+    },
   },
   { timestamps: true },
 );

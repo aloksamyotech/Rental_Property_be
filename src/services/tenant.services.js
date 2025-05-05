@@ -566,3 +566,16 @@ export const bulkUploadTenants = async (req) => {
     return createdTenants
 
 };
+
+export const changePassword = async (req) => {
+  const { id, newPassword } = req.body;
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  const result = await Tenant.findByIdAndUpdate(id, {
+    $set: {
+      password: hashedPassword,
+    },
+  });
+  return result;
+};

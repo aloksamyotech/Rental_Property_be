@@ -39,4 +39,9 @@ export const deleteAgent = async(req, res, next) => {
   res.status(statusCodes?.created).send(agentData);
 };
 
+export const changePassword = async(req, res, next) => {
+  const agentData = await agentServices.changePassword(req, res);
+  res.status(statusCodes?.created).send(agentData);
+};
+
 

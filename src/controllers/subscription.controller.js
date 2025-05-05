@@ -25,3 +25,14 @@ export const deleteSubscriptions = async(req, res, next) => {
   const Subscription = await subscription.deleteSubscriptions(req, res, next);
   res.status(statusCodes?.created).send(Subscription);
 };
+
+export const getSubTransaction = async(req, res, next) => {
+  const Subscription = await subscription.getSubTransaction(req, res, next);
+  res.status(statusCodes?.created).send(Subscription);
+};
+
+
+export const getAllSubTransaction = async(req, res, next) => {
+  const Subscription = await subscription.getAllSubTransaction(req, res, next);
+  res.status(statusCodes?.created).send(Subscription);
+};
